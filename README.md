@@ -2,7 +2,7 @@
 Browser for PDF files. 
 
 ### Based on
-Popppler, Qt.
+Poppler, Qt.
 
 ### License
 GNU GPL v3.
