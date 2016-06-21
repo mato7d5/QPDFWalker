@@ -24,20 +24,14 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 class PDFWalkerArray : public PDFWalkerObject
 {
-public:
-    struct ArrayData {
-        QString value;
-        ObjectSharedPtr object;
-    };
-
 private:
-    QList<ArrayData> mItems;
+    QList<ObjectSharedPtr> mItems;
 
 public:
     PDFWalkerArray();
 
-    void addItem(ArrayData dataItem) { mItems.push_back(dataItem); }
-    const QList<ArrayData>& items() const { return mItems; }
+    void addItem(ObjectSharedPtr item) { mItems.push_back(item); }
+    const QList<ObjectSharedPtr>& items() const { return mItems; }
 };
 
 #endif // PDFWALKERARRAY_H

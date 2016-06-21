@@ -116,11 +116,10 @@ void PDFWalker::loadNameObject(Object* source, PDFWalkerName* dest) {
 
 void PDFWalker::loadArrayObject(Object* source, PDFWalkerArray* dest) {
     for (int i = 0; i < source->arrayGetLength(); ++i) {
-        PDFWalkerArray::ArrayData data;
         ObjectSharedPtr object = std::make_shared<Object> ();
         source->arrayGetNF(i, object.get());
-        data.object = object;
 
+        dest->addItem(object);
     }
 }
 
@@ -145,6 +144,13 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen)
             ret->setNumber(number);
             ret->setGeneration(gen);
         }
+
+        if (obj.isArray()) {
+            ret.reset(new PDFWalkerArray());
+            loadArrayObject(&obj, dynamic_cast<PDFWalkerArray*> (ret.get()));
+            ret->setNumber(number);
+            ret->setGeneration(gen);
+        }
     }
 
     return ret;
@@ -162,6 +168,12 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(const ObjectSharedPt
     if (object->isName()) {
         ret.reset(new PDFWalkerName());
         loadNameObject(object.get(), dynamic_cast<PDFWalkerName*> (ret.get()));
+        ret->setDirect();
+    }
+
+    if (object->isArray()) {
+        ret.reset(new PDFWalkerArray());
+        loadArrayObject(object.get(), dynamic_cast<PDFWalkerArray*> (ret.get()));
         ret->setDirect();
     }
 
