@@ -75,20 +75,6 @@ QString PDFWalker::objTypeString(ObjType type) {
     return "";
 }
 
-QString PDFWalker::objValueToString(Object* object) {
-    QString ret;
-
-   /* switch (object->getType()) {
-    case value:
-
-        break;
-    default:
-        break;
-    }*/
-
-    return ret;
-}
-
 QString PDFWalker::PDFWalkerObjectTitle(PDFWalkerObject* obj) {
     if (obj->isIndirect())
         return QString::fromUtf8("%1 [%2 %3]").arg(objTypeString(obj->type())).arg(obj->number()).arg(obj->generation());
@@ -123,6 +109,11 @@ void PDFWalker::loadArrayObject(Object* source, PDFWalkerArray* dest) {
     }
 }
 
+void PDFWalker::loadStringObject(Object* source, PDFWalkerString* dest) {
+    QString value(source->getString()->getCString());
+    dest->setValue(value);
+}
+
 std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen) {
     std::unique_ptr<PDFWalkerObject> ret(nullptr);
 
@@ -151,6 +142,13 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen)
             ret->setNumber(number);
             ret->setGeneration(gen);
         }
+
+        if (obj.isString()) {
+            ret.reset(new PDFWalkerString());
+            loadStringObject(&obj, dynamic_cast<PDFWalkerString*> (ret.get()));
+            ret->setNumber(number);
+            ret->setGeneration(gen);
+        }
     }
 
     return ret;
@@ -174,6 +172,12 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(const ObjectSharedPt
     if (object->isArray()) {
         ret.reset(new PDFWalkerArray());
         loadArrayObject(object.get(), dynamic_cast<PDFWalkerArray*> (ret.get()));
+        ret->setDirect();
+    }
+
+    if (object->isString()) {
+        ret.reset(new PDFWalkerString());
+        loadStringObject(object.get(), dynamic_cast<PDFWalkerString*> (ret.get()));
         ret->setDirect();
     }
 

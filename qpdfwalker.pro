@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     pdfwalkerobject.cpp \
     pdfwalkerdictionary.cpp \
     pdfwalkername.cpp \
-    pdfwalkerarray.cpp
+    pdfwalkerarray.cpp \
+    pdfwalkerstring.cpp
 
 HEADERS  += maindialog.h \
     walkerwindow.h \
@@ -34,7 +35,8 @@ HEADERS  += maindialog.h \
     pdfwalkerobject.h \
     pdfwalkerdictionary.h \
     pdfwalkername.h \
-    pdfwalkerarray.h
+    pdfwalkerarray.h \
+    pdfwalkerstring.h
 
 FORMS    += maindialog.ui \
     walkerwindow.ui

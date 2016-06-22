@@ -32,6 +32,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "pdfwalkerdictionary.h"
 #include "pdfwalkername.h"
 #include "pdfwalkerarray.h"
+#include "pdfwalkerstring.h"
 
 class PDFWalkerException : public std::exception {
 private:
@@ -52,11 +53,11 @@ private:
     std::shared_ptr<PDFWalkerDictionary> mCatalog;
 
     static QString objTypeString(ObjType type);
-    static QString objValueToString(Object* object);
 
     static void loadDictionaryObject(Object* source, PDFWalkerDictionary* dest);
     static void loadNameObject(Object* source, PDFWalkerName* dest);
     static void loadArrayObject(Object* source, PDFWalkerArray* dest);
+    static void loadStringObject(Object* source, PDFWalkerString* dest);
 
 public:
     PDFWalker(const std::string& fileName);
