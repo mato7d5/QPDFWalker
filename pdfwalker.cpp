@@ -99,7 +99,6 @@ void PDFWalker::loadNameObject(Object* source, PDFWalkerName* dest) {
     dest->setValue(value);
 }
 
-
 void PDFWalker::loadArrayObject(Object* source, PDFWalkerArray* dest) {
     for (int i = 0; i < source->arrayGetLength(); ++i) {
         ObjectSharedPtr object = std::make_shared<Object> ();
@@ -111,6 +110,11 @@ void PDFWalker::loadArrayObject(Object* source, PDFWalkerArray* dest) {
 
 void PDFWalker::loadStringObject(Object* source, PDFWalkerString* dest) {
     QString value(source->getString()->getCString());
+    dest->setValue(value);
+}
+
+void PDFWalker::loadIntegerObject(Object* source, PDFWalkerInteger* dest) {
+    QString value = QString("%1").arg(source->getInt());
     dest->setValue(value);
 }
 
@@ -149,6 +153,13 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen)
             ret->setNumber(number);
             ret->setGeneration(gen);
         }
+
+        if (obj.isInt()) {
+            ret.reset(new PDFWalkerInteger());
+            loadIntegerObject(&obj, dynamic_cast<PDFWalkerInteger*> (ret.get()));
+            ret->setNumber(number);
+            ret->setGeneration(gen);
+        }
     }
 
     return ret;
@@ -178,6 +189,12 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(const ObjectSharedPt
     if (object->isString()) {
         ret.reset(new PDFWalkerString());
         loadStringObject(object.get(), dynamic_cast<PDFWalkerString*> (ret.get()));
+        ret->setDirect();
+    }
+
+    if (object->isInt()) {
+        ret.reset(new PDFWalkerInteger());
+        loadIntegerObject(object.get(), dynamic_cast<PDFWalkerInteger*> (ret.get()));
         ret->setDirect();
     }
 

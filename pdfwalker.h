@@ -33,6 +33,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "pdfwalkername.h"
 #include "pdfwalkerarray.h"
 #include "pdfwalkerstring.h"
+#include "pdfwalkerinteger.h"
 
 class PDFWalkerException : public std::exception {
 private:
@@ -58,6 +59,7 @@ private:
     static void loadNameObject(Object* source, PDFWalkerName* dest);
     static void loadArrayObject(Object* source, PDFWalkerArray* dest);
     static void loadStringObject(Object* source, PDFWalkerString* dest);
+    static void loadIntegerObject(Object* soruce, PDFWalkerInteger* dest);
 
 public:
     PDFWalker(const std::string& fileName);

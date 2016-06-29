@@ -110,6 +110,13 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
             mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
         }
 
+        if (object->type() == objInt) {
+            PDFWalkerInteger* integer = static_cast<PDFWalkerInteger*> (object);
+            QListWidgetItem* widgetItem = new QListWidgetItem(integer->value());
+            ViewItemData itemData = { nullptr, mNextViewWindowIndex };
+            mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
+        }
+
         connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectClicked(const ViewItemData&)), this, SLOT(pdfObjectClickedSlot(const ViewItemData&)));
         ++mNextViewWindowIndex;
     }
