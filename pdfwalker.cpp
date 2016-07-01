@@ -113,11 +113,6 @@ void PDFWalker::loadStringObject(Object* source, PDFWalkerString* dest) {
     dest->setValue(value);
 }
 
-void PDFWalker::loadIntegerObject(Object* source, PDFWalkerInteger* dest) {
-    QString value = QString("%1").arg(source->getInt());
-    dest->setValue(value);
-}
-
 std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen) {
     std::unique_ptr<PDFWalkerObject> ret(nullptr);
 
@@ -154,9 +149,22 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen)
             ret->setGeneration(gen);
         }
 
-        if (obj.isInt()) {
-            ret.reset(new PDFWalkerInteger());
-            loadIntegerObject(&obj, dynamic_cast<PDFWalkerInteger*> (ret.get()));
+        if (obj.isInt() || obj.isInt64() || obj.isReal()) {
+            switch (obj.getType()) {
+            case objInt:
+                ret.reset(new PDFWalkerNumber<int>());
+                loadNumberObject<int>(&obj, dynamic_cast<PDFWalkerNumber<int>*> (ret.get()));
+                break;
+            case objInt64:
+                ret.reset(new PDFWalkerNumber<long long>());
+                loadNumberObject<long long>(&obj, dynamic_cast<PDFWalkerNumber<long long>*> (ret.get()));
+            case objReal:
+                ret.reset(new PDFWalkerNumber<double>());
+                loadNumberObject<double>(&obj, dynamic_cast<PDFWalkerNumber<double>*> (ret.get()));
+            default:
+                return nullptr;
+            }
+
             ret->setNumber(number);
             ret->setGeneration(gen);
         }
@@ -192,9 +200,22 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(const ObjectSharedPt
         ret->setDirect();
     }
 
-    if (object->isInt()) {
-        ret.reset(new PDFWalkerInteger());
-        loadIntegerObject(object.get(), dynamic_cast<PDFWalkerInteger*> (ret.get()));
+    if (object->isInt() || object->isInt64() || object->isReal()) {
+        switch (object->getType()) {
+        case objInt:
+            ret.reset(new PDFWalkerNumber<int>());
+            loadNumberObject<int>(object.get(), dynamic_cast<PDFWalkerNumber<int>*> (ret.get()));
+            break;
+        case objInt64:
+            ret.reset(new PDFWalkerNumber<long long>());
+            loadNumberObject<long long>(object.get(), dynamic_cast<PDFWalkerNumber<long long>*> (ret.get()));
+        case objReal:
+            ret.reset(new PDFWalkerNumber<double>());
+            loadNumberObject<double>(object.get(), dynamic_cast<PDFWalkerNumber<double>*> (ret.get()));
+        default:
+            return nullptr;
+        }
+
         ret->setDirect();
     }
 

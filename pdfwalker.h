@@ -33,7 +33,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "pdfwalkername.h"
 #include "pdfwalkerarray.h"
 #include "pdfwalkerstring.h"
-#include "pdfwalkerinteger.h"
+#include "pdfwalkernumber.h"
 
 class PDFWalkerException : public std::exception {
 private:
@@ -59,7 +59,9 @@ private:
     static void loadNameObject(Object* source, PDFWalkerName* dest);
     static void loadArrayObject(Object* source, PDFWalkerArray* dest);
     static void loadStringObject(Object* source, PDFWalkerString* dest);
-    static void loadIntegerObject(Object* soruce, PDFWalkerInteger* dest);
+
+    template<typename T>
+    static void loadNumberObject(Object* soruce, PDFWalkerNumber<T>* dest);
 
 public:
     PDFWalker(const std::string& fileName);
@@ -72,5 +74,11 @@ public:
 
     static QString PDFWalkerObjectTitle(PDFWalkerObject* obj);
 };
+
+template<typename T>
+void PDFWalker::loadNumberObject(Object* source, PDFWalkerNumber<T>* dest) {
+    QString value = QString("%1").arg(source->getInt());
+    dest->setValue(value);
+}
 
 #endif // PDFWALKER_H

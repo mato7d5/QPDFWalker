@@ -14,22 +14,39 @@ with this program; if not, write to the
 Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef PDFWALKERINTEGER_H
-#define PDFWALKERINTEGER_H
+#ifndef PDFWALKERNUMBER_H
+#define PDFWALKERNUMBER_H
 
 #include <QString>
+#include <type_traits>
 #include "pdfwalkerobject.h"
 
-class PDFWalkerInteger : public PDFWalkerObject
+template<typename T>
+class PDFWalkerNumber : public PDFWalkerObject
 {
 private:
     QString mValue;
 
 public:
-    PDFWalkerInteger();
+    PDFWalkerNumber();
 
     void setValue(const QString& value) { mValue = value; }
     QString value() const { return mValue; }
 };
 
-#endif // PDFWALKERINTEGER_H
+template<typename T>
+PDFWalkerNumber<T>::PDFWalkerNumber() : PDFWalkerObject() {
+    static_assert(std::is_arithmetic<T>::value, "None numerical type.");
+
+    if (std::is_integral<T>::value) {
+        if (sizeof(T) == sizeof(int))
+            mObjType = objInt;
+        if (sizeof(T) == sizeof(long long))
+            mObjType = objInt64;
+    }
+
+    if (std::is_floating_point<T>::value)
+        mObjType = objReal;
+}
+
+#endif // PDFWALKERNUMBER_H

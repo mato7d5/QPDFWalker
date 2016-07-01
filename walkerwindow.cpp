@@ -111,7 +111,7 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
         }
 
         if (object->type() == objInt) {
-            PDFWalkerInteger* integer = static_cast<PDFWalkerInteger*> (object);
+            PDFWalkerNumber<int>* integer = static_cast<PDFWalkerNumber<int>*> (object);
             QListWidgetItem* widgetItem = new QListWidgetItem(integer->value());
             ViewItemData itemData = { nullptr, mNextViewWindowIndex };
             mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
