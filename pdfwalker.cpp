@@ -113,6 +113,10 @@ void PDFWalker::loadStringObject(Object* source, PDFWalkerString* dest) {
     dest->setValue(value);
 }
 
+void PDFWalker::loadBooleanObject(Object* source, PDFWalkerBoolean* dest) {
+    dest->setValue(source->getBool() ? "True" : "False");
+}
+
 std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen) {
     std::unique_ptr<PDFWalkerObject> ret(nullptr);
 
@@ -168,6 +172,13 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen)
             ret->setNumber(number);
             ret->setGeneration(gen);
         }
+
+        if (obj.isBool()) {
+            ret.reset(new PDFWalkerBoolean());
+            loadBooleanObject(&obj, dynamic_cast<PDFWalkerBoolean*> (ret.get()));
+            ret->setNumber(number);
+            ret->setGeneration(gen);
+        }
     }
 
     return ret;
@@ -216,6 +227,12 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(const ObjectSharedPt
             return nullptr;
         }
 
+        ret->setDirect();
+    }
+
+    if (object->isBool()) {
+        ret.reset(new PDFWalkerBoolean());
+        loadBooleanObject(object.get(), dynamic_cast<PDFWalkerBoolean*> (ret.get()));
         ret->setDirect();
     }
 

@@ -34,6 +34,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "pdfwalkerarray.h"
 #include "pdfwalkerstring.h"
 #include "pdfwalkernumber.h"
+#include "pdfwalkerboolean.h"
 
 class PDFWalkerException : public std::exception {
 private:
@@ -59,6 +60,7 @@ private:
     static void loadNameObject(Object* source, PDFWalkerName* dest);
     static void loadArrayObject(Object* source, PDFWalkerArray* dest);
     static void loadStringObject(Object* source, PDFWalkerString* dest);
+    static void loadBooleanObject(Object* source, PDFWalkerBoolean* dest);
 
     template<typename T>
     static void loadNumberObject(Object* soruce, PDFWalkerNumber<T>* dest);
