@@ -53,4 +53,5 @@ void PDFDataView::addItem(QListWidgetItem* item, ViewItemData data) {
 void PDFDataView::clearView() {
     mLabel->setText("");
     mListWidget->clear();
+    mItems.clear();
 }

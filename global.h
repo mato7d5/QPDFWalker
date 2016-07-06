@@ -23,7 +23,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 using ObjectSharedPtr = std::shared_ptr<Object>;
 
 struct ViewItemData {
-    ObjectSharedPtr object;
+    ObjectSharedPtr object = nullptr;
     int currentViewIndex = {-1};
 };
 
