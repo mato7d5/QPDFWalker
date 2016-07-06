@@ -111,8 +111,29 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
         }
 
         if (object->type() == objInt) {
-            PDFWalkerNumber<int>* integer = static_cast<PDFWalkerNumber<int>*> (object);
-            QListWidgetItem* widgetItem = new QListWidgetItem(integer->value());
+            PDFWalkerNumber<int>* number = static_cast<PDFWalkerNumber<int>*> (object);
+            QListWidgetItem* widgetItem = new QListWidgetItem(number->value());
+            ViewItemData itemData = { nullptr, mNextViewWindowIndex };
+            mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
+        }
+
+        if (object->type() == objInt64) {
+            PDFWalkerNumber<long long>* number = static_cast<PDFWalkerNumber<long long>*> (object);
+            QListWidgetItem* widgetItem = new QListWidgetItem(number->value());
+            ViewItemData itemData = { nullptr, mNextViewWindowIndex };
+            mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
+        }
+
+        if (object->type() == objReal) {
+            PDFWalkerNumber<double>* number = static_cast<PDFWalkerNumber<double>*> (object);
+            QListWidgetItem* widgetItem = new QListWidgetItem(number->value());
+            ViewItemData itemData = { nullptr, mNextViewWindowIndex };
+            mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
+        }
+
+        if (object->type() == objBool) {
+            PDFWalkerBoolean* boolObj =  static_cast<PDFWalkerBoolean*> (object);
+            QListWidgetItem* widgetItem = new QListWidgetItem(boolObj->value());
             ViewItemData itemData = { nullptr, mNextViewWindowIndex };
             mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
         }
