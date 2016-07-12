@@ -16,6 +16,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 #include "pdfwalker.h"
 #include <XRef.h>
+#include <Stream.h>
 #include <utility>
 
 PDFWalker::PDFWalker(const std::string& fileName) {
@@ -117,6 +118,12 @@ void PDFWalker::loadBooleanObject(Object* source, PDFWalkerBoolean* dest) {
     dest->setValue(source->getBool() ? "True" : "False");
 }
 
+void PDFWalker::loadStreamObject(Object* source, PDFWalkerStream* dest) {
+    Object* sourceCopy = new Object;
+    source->copy(sourceCopy);
+    dest->setValue(sourceCopy);
+}
+
 std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen) {
     std::unique_ptr<PDFWalkerObject> ret(nullptr);
 
@@ -179,6 +186,13 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen)
             ret->setNumber(number);
             ret->setGeneration(gen);
         }
+
+        if (obj.isStream()) {
+            ret.reset(new PDFWalkerStream());
+            loadStreamObject(&obj, dynamic_cast<PDFWalkerStream*> (ret.get()));
+            ret->setNumber(number);
+            ret->setGeneration(gen);
+        }
     }
 
     return ret;
@@ -233,6 +247,12 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(const ObjectSharedPt
     if (object->isBool()) {
         ret.reset(new PDFWalkerBoolean());
         loadBooleanObject(object.get(), dynamic_cast<PDFWalkerBoolean*> (ret.get()));
+        ret->setDirect();
+    }
+
+    if (object->isStream()) {
+        ret.reset(new PDFWalkerStream());
+        loadStreamObject(object.get(), dynamic_cast<PDFWalkerStream*> (ret.get()));
         ret->setDirect();
     }
 
