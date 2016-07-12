@@ -17,6 +17,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "pdfwalkerstream.h"
 #include "pdfwalker.h"
 #include <Stream.h>
+#include <Dict.h>
 #include <utility>
 
 PDFWalkerStream::PDFWalkerStream() : mObject(nullptr)
@@ -34,8 +35,21 @@ std::shared_ptr<PDFWalkerDictionary> PDFWalkerStream::getStreamDict() {
     if (mObject == nullptr)
         return nullptr;
 
+    Dict* streamDict = mObject->getStream()->getDict();
+    if (streamDict == nullptr)
+        return nullptr;
+
     std::shared_ptr<PDFWalkerDictionary> ret = std::make_shared<PDFWalkerDictionary> ();
-    PDFWalker::loadDictionaryObject(mObject.get(), ret.get());
+
+    for (int i = 0; i < streamDict->getLength(); ++i) {
+        PDFWalkerDictionary::DictionaryData data;
+        data.key = streamDict->getKey(i);
+        ObjectSharedPtr value = std::make_shared<Object> ();
+        streamDict->getValNF(i, value.get());
+        data.value = value;
+
+        ret->addItem(data);
+    }
 
     return ret;
 }

@@ -57,7 +57,6 @@ private:
 
     static QString objTypeString(ObjType type);
 
-public:
     static void loadDictionaryObject(Object* source, PDFWalkerDictionary* dest);
     static void loadNameObject(Object* source, PDFWalkerName* dest);
     static void loadArrayObject(Object* source, PDFWalkerArray* dest);

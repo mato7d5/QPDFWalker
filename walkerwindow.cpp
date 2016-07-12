@@ -18,8 +18,6 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "ui_walkerwindow.h"
 #include <QList>
 #include <QListWidgetItem>
-#include "pdfwalkerobject.h"
-#include "pdfwalkerdictionary.h"
 
 WalkerWindow::WalkerWindow(std::shared_ptr<PDFWalker> walker, QWidget *parent) :
     QDialog(parent),
@@ -142,6 +140,21 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
             QListWidgetItem* widgetItem = new QListWidgetItem("Null");
             ViewItemData itemData = { nullptr, mNextViewWindowIndex };
             mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
+        }
+
+        if (object->type() == objStream) {
+            PDFWalkerStream* streamObj = static_cast<PDFWalkerStream*> (object);
+
+            QListWidgetItem* dataWI = new QListWidgetItem("[Data]");
+            ViewItemData dataWID = { nullptr, mNextViewWindowIndex };
+            mDataViews[mNextViewWindowIndex]->addItem(dataWI, dataWID);
+
+            auto streamDict = streamObj->getStreamDict();
+            for (const auto& item : streamDict->items()) {
+                QListWidgetItem* i = new QListWidgetItem(item.key);
+                ViewItemData itemData = { item.value, mNextViewWindowIndex };
+                mDataViews[mNextViewWindowIndex]->addItem(i, itemData);
+            }
         }
 
         connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectClicked(const ViewItemData&)), this, SLOT(pdfObjectClickedSlot(const ViewItemData&)));
