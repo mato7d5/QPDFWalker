@@ -45,6 +45,9 @@ WalkerWindow::~WalkerWindow()
 
 //slots
 void WalkerWindow::pdfObjectClickedSlot(const ViewItemData& data) {
+    if (data.object->isStream())
+        return;
+
     if (data.object->isRef()) {
         mNextViewWindowIndex = data.currentViewIndex + 1;
         loadObject(data.object->getRefNum(), data.object->getRefGen());
@@ -144,9 +147,10 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
 
         if (object->type() == objStream) {
             PDFWalkerStream* streamObj = static_cast<PDFWalkerStream*> (object);
+            ObjectSharedPtr value = streamObj->value();
 
             QListWidgetItem* dataWI = new QListWidgetItem("[Data]");
-            ViewItemData dataWID = { nullptr, mNextViewWindowIndex };
+            ViewItemData dataWID = { value, mNextViewWindowIndex };
             mDataViews[mNextViewWindowIndex]->addItem(dataWI, dataWID);
 
             auto streamDict = streamObj->getStreamDict();
@@ -175,12 +179,18 @@ void WalkerWindow::loadCatalog() {
 
 void WalkerWindow::loadObject(int number, int gen) {
     auto obj = mWalker->pdfWalkerObject(number, gen);
-    QString title = PDFWalker::PDFWalkerObjectTitle(obj.get());
-    objectToView(title, obj.get());
+
+    if (obj) {
+        QString title = PDFWalker::PDFWalkerObjectTitle(obj.get());
+        objectToView(title, obj.get());
+    }
 }
 
 void WalkerWindow::loadObject(ObjectSharedPtr obj) {
    auto object = mWalker->pdfWalkerObject(obj);
-   QString title = PDFWalker::PDFWalkerObjectTitle(object.get());
-   objectToView(title, object.get());
+
+   if (object) {
+    QString title = PDFWalker::PDFWalkerObjectTitle(object.get());
+    objectToView(title, object.get());
+   }
 }

@@ -24,7 +24,7 @@ using ObjectSharedPtr = std::shared_ptr<Object>;
 
 struct ViewItemData {
     ObjectSharedPtr object = nullptr;
-    int currentViewIndex = {-1};
+    int currentViewIndex = { -1} ;
 };
 
 #endif // GLOBAL_H

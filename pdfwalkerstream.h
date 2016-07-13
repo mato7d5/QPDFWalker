@@ -31,6 +31,7 @@ public:
     ~PDFWalkerStream();
 
     void setValue(Object* obj) { mObject.reset(obj); }
+    ObjectSharedPtr value() const { return mObject; }
     std::shared_ptr<PDFWalkerDictionary> getStreamDict();
 };
 
