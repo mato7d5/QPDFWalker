@@ -36,7 +36,7 @@ WalkerWindow::WalkerWindow(std::shared_ptr<PDFWalker> walker, QWidget *parent) :
         mDataViews.push_back(view);
     }
 
-    loadCatalog();
+    loadTrailer();
 }
 
 WalkerWindow::~WalkerWindow()
@@ -180,15 +180,15 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
     }
 }
 
-void WalkerWindow::loadCatalog() {
+void WalkerWindow::loadTrailer() {
     while (mNextViewWindowIndex > 0) {
         //clear content of listwidgets
         --mNextViewWindowIndex;
     }
 
-    auto catalog = mWalker->catalog();
-    QString title = QString::fromUtf8("Catalog [%1 %2]").arg(catalog->number()).arg(catalog->generation());
-    objectToView(title, catalog.get());
+    auto trailerDict = mWalker->trailerDictionary();
+    QString title = QString::fromUtf8("Trailer");
+    objectToView(title, trailerDict.get());
 }
 
 void WalkerWindow::loadObject(int number, int gen) {

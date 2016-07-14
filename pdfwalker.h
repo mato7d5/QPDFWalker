@@ -53,7 +53,7 @@ class PDFWalker final
 private:
     GooString* mFileName;
     std::unique_ptr<PDFDoc> mPDFDoc;
-    std::shared_ptr<PDFWalkerDictionary> mCatalog;
+    std::shared_ptr<PDFWalkerDictionary> mTrailerDictionary;
 
     static QString objTypeString(ObjType type);
 
@@ -71,7 +71,7 @@ public:
     PDFWalker(const std::string& fileName);
     ~PDFWalker();
 
-    std::shared_ptr<PDFWalkerDictionary> catalog() { return mCatalog; }
+    std::shared_ptr<PDFWalkerDictionary> trailerDictionary() { return mTrailerDictionary; }
 
     std::unique_ptr<PDFWalkerObject> pdfWalkerObject(int number, int gen);
     std::unique_ptr<PDFWalkerObject> pdfWalkerObject(const ObjectSharedPtr& object);

@@ -26,10 +26,16 @@ PDFWalker::PDFWalker(const std::string& fileName) {
     if (!mPDFDoc->isOk())
         throw PDFWalkerException("Cannot open file!");
 
-    //catalog
+    //trailer dict
     XRef* xref = mPDFDoc->getXRef();
-    auto catalogDict = pdfWalkerObject(xref->getRootNum(), xref->getRootGen());
-    mCatalog.reset(dynamic_cast<PDFWalkerDictionary*> (catalogDict.release()));
+    Object* trailer = xref->getTrailerDict();
+
+    ObjectSharedPtr trailerCopy = std::make_shared<Object> ();
+    trailer->copy(trailerCopy.get());
+
+    auto trailerDict = pdfWalkerObject(trailerCopy);
+
+    mTrailerDictionary.reset(dynamic_cast<PDFWalkerDictionary*> (trailerDict.release()));
 }
 
 PDFWalker::~PDFWalker() {

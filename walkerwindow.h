@@ -41,7 +41,7 @@ private:
 
     void addNewViewWindow();
     void objectToView(const QString& title, PDFWalkerObject* object);
-    void loadCatalog();
+    void loadTrailer();
     void loadObject(int number, int gen);
     void loadObject(ObjectSharedPtr obj);
 
