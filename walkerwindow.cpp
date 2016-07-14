@@ -77,7 +77,7 @@ void WalkerWindow::addNewViewWindow() {
     mDataViews.push_back(view);
 }
 
-void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
+void WalkerWindow::objectToView(PDFWalkerObject* object) {
     if (mNextViewWindowIndex == mViewWindowCount)
         addNewViewWindow();
 
@@ -85,7 +85,11 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
         mDataViews[i]->clearView();
 
     if (object != nullptr) {
-        mDataViews[mNextViewWindowIndex]->setCaption(title);
+        QString title;
+        if (object->isIndirect())
+            title.append(QString::fromUtf8("%1 [%2 %3]").arg(PDFWalker::objTypeString(object->type())).arg(object->number()).arg(object->generation()));
+        else
+            title.append(QString::fromUtf8("%1").arg(PDFWalker::objTypeString(object->type())));
 
         if (object->type() == objDict) {
             PDFWalkerDictionary* dict =  static_cast<PDFWalkerDictionary*> (object);
@@ -106,12 +110,16 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
         if (object->type() == objArray) {
             PDFWalkerArray* array = static_cast<PDFWalkerArray*> (object);
             auto arrayItems = array->items();
-            for (int i = 0; i < arrayItems.size(); ++i) {
+            auto arrayItemsCount = arrayItems.size();
+
+            for (int i = 0; i < arrayItemsCount; ++i) {
                 QString str = QString("[%1]").arg(i);
                 QListWidgetItem* widgetItem = new QListWidgetItem(str);
                 ViewItemData itemData = { arrayItems[i], mNextViewWindowIndex };
                 mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
             }
+
+            title.append(QString::fromUtf8(" (%1)").arg(arrayItemsCount));
         }
 
         if (object->type() == objString) {
@@ -175,6 +183,8 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
             connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectDoubleClicked(const ViewItemData&)), this, SLOT(pdfObjectDoubleClickedSlot(const ViewItemData&)), Qt::UniqueConnection);
         }
 
+        mDataViews[mNextViewWindowIndex]->setCaption(title);
+
         connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectClicked(const ViewItemData&)), this, SLOT(pdfObjectClickedSlot(const ViewItemData&)), Qt::UniqueConnection);
         ++mNextViewWindowIndex;
     }
@@ -188,15 +198,14 @@ void WalkerWindow::loadTrailer() {
 
     auto trailerDict = mWalker->trailerDictionary();
     QString title = QString::fromUtf8("Trailer");
-    objectToView(title, trailerDict.get());
+    objectToView(trailerDict.get());
 }
 
 void WalkerWindow::loadObject(int number, int gen) {
     auto obj = mWalker->pdfWalkerObject(number, gen);
 
     if (obj) {
-        QString title = PDFWalker::PDFWalkerObjectTitle(obj.get());
-        objectToView(title, obj.get());
+        objectToView(obj.get());
     }
 }
 
@@ -204,7 +213,6 @@ void WalkerWindow::loadObject(ObjectSharedPtr obj) {
    auto object = mWalker->pdfWalkerObject(obj);
 
    if (object) {
-       QString title = PDFWalker::PDFWalkerObjectTitle(object.get());
-       objectToView(title, object.get());
+       objectToView(object.get());
    }
 }

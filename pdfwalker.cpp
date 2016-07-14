@@ -82,13 +82,6 @@ QString PDFWalker::objTypeString(ObjType type) {
     return "";
 }
 
-QString PDFWalker::PDFWalkerObjectTitle(PDFWalkerObject* obj) {
-    if (obj->isIndirect())
-        return QString::fromUtf8("%1 [%2 %3]").arg(objTypeString(obj->type())).arg(obj->number()).arg(obj->generation());
-
-    return QString::fromUtf8("%1").arg(objTypeString(obj->type()));
-}
-
 void PDFWalker::loadDictionaryObject(Object* source, PDFWalkerDictionary* dest) {
     for (int i = 0; i < source->dictGetLength(); ++i) {
         PDFWalkerDictionary::DictionaryData data;

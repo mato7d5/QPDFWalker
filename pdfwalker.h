@@ -55,8 +55,6 @@ private:
     std::unique_ptr<PDFDoc> mPDFDoc;
     std::shared_ptr<PDFWalkerDictionary> mTrailerDictionary;
 
-    static QString objTypeString(ObjType type);
-
     static void loadDictionaryObject(Object* source, PDFWalkerDictionary* dest);
     static void loadNameObject(Object* source, PDFWalkerName* dest);
     static void loadArrayObject(Object* source, PDFWalkerArray* dest);
@@ -76,7 +74,7 @@ public:
     std::unique_ptr<PDFWalkerObject> pdfWalkerObject(int number, int gen);
     std::unique_ptr<PDFWalkerObject> pdfWalkerObject(const ObjectSharedPtr& object);
 
-    static QString PDFWalkerObjectTitle(PDFWalkerObject* obj);
+    static QString objTypeString(ObjType type);
 };
 
 template<typename T>

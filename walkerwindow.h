@@ -40,7 +40,7 @@ private:
     int mNextViewWindowIndex;
 
     void addNewViewWindow();
-    void objectToView(const QString& title, PDFWalkerObject* object);
+    void objectToView(PDFWalkerObject* object);
     void loadTrailer();
     void loadObject(int number, int gen);
     void loadObject(ObjectSharedPtr obj);
