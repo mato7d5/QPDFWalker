@@ -54,6 +54,7 @@ private:
 
 private slots:
     void pdfObjectClickedSlot(const ViewItemData& data);
+    void pdfObjectDoubleClickedSlot(const ViewItemData& data);
 };
 
 #endif // WALKERWINDOW_H

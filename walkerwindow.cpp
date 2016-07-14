@@ -16,6 +16,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 #include "walkerwindow.h"
 #include "ui_walkerwindow.h"
+#include "streamdatadialog.h"
 #include <QList>
 #include <QListWidgetItem>
 
@@ -45,16 +46,25 @@ WalkerWindow::~WalkerWindow()
 
 //slots
 void WalkerWindow::pdfObjectClickedSlot(const ViewItemData& data) {
-    if (data.object->isStream())
-        return;
-
-    if (data.object->isRef()) {
-        mNextViewWindowIndex = data.currentViewIndex + 1;
-        loadObject(data.object->getRefNum(), data.object->getRefGen());
+    if (data.object->isStream()) {
+        return; // do nothing for stream data. they are handled by double click slot.
     }
     else {
-        mNextViewWindowIndex = data.currentViewIndex + 1;
-        loadObject(data.object);
+        if (data.object->isRef()) {
+            mNextViewWindowIndex = data.currentViewIndex + 1;
+            loadObject(data.object->getRefNum(), data.object->getRefGen());
+        }
+        else {
+            mNextViewWindowIndex = data.currentViewIndex + 1;
+            loadObject(data.object);
+        }
+    }
+}
+
+void WalkerWindow::pdfObjectDoubleClickedSlot(const ViewItemData& data) {
+    if (data.object->isStream()) {
+        StreamDataDialog dlg(data.object, this);
+        dlg.exec();
     }
 }
 
@@ -148,9 +158,11 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
         if (object->type() == objStream) {
             PDFWalkerStream* streamObj = static_cast<PDFWalkerStream*> (object);
             ObjectSharedPtr value = streamObj->value();
+            ObjectSharedPtr valueCopy = std::make_shared<Object> ();
+            value->copy(valueCopy.get());
 
             QListWidgetItem* dataWI = new QListWidgetItem("[Data]");
-            ViewItemData dataWID = { value, mNextViewWindowIndex };
+            ViewItemData dataWID = { valueCopy, mNextViewWindowIndex };
             mDataViews[mNextViewWindowIndex]->addItem(dataWI, dataWID);
 
             auto streamDict = streamObj->getStreamDict();
@@ -159,9 +171,11 @@ void WalkerWindow::objectToView(const QString& title, PDFWalkerObject* object) {
                 ViewItemData itemData = { item.value, mNextViewWindowIndex };
                 mDataViews[mNextViewWindowIndex]->addItem(i, itemData);
             }
+
+            connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectDoubleClicked(const ViewItemData&)), this, SLOT(pdfObjectDoubleClickedSlot(const ViewItemData&)), Qt::UniqueConnection);
         }
 
-        connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectClicked(const ViewItemData&)), this, SLOT(pdfObjectClickedSlot(const ViewItemData&)));
+        connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectClicked(const ViewItemData&)), this, SLOT(pdfObjectClickedSlot(const ViewItemData&)), Qt::UniqueConnection);
         ++mNextViewWindowIndex;
     }
 }
@@ -190,7 +204,7 @@ void WalkerWindow::loadObject(ObjectSharedPtr obj) {
    auto object = mWalker->pdfWalkerObject(obj);
 
    if (object) {
-    QString title = PDFWalker::PDFWalkerObjectTitle(object.get());
-    objectToView(title, object.get());
+       QString title = PDFWalker::PDFWalkerObjectTitle(object.get());
+       objectToView(title, object.get());
    }
 }

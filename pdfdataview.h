@@ -47,9 +47,11 @@ public:
 
 signals:
     void pdfObjectClicked(const ViewItemData& obj);
+    void pdfObjectDoubleClicked(const ViewItemData& obj);
 
 private slots:
     void listWidgetClicked(QListWidgetItem* item);
+    void listWidgetDoubleClicked(QListWidgetItem* item);
 };
 
 #endif // PDFDATAVIEW_H

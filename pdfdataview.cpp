@@ -32,6 +32,8 @@ PDFDataView::PDFDataView(QWidget *parent) : QWidget(parent)
     layout->addWidget(mListWidget);
 
     connect(mListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listWidgetClicked(QListWidgetItem*)));
+    connect(mListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listWidgetDoubleClicked(QListWidgetItem*)));
+
     setLayout(layout);
 }
 
@@ -41,6 +43,14 @@ void PDFDataView::listWidgetClicked(QListWidgetItem* item) {
 
     if (itemData != mItems.end() && itemData->second.object != nullptr) {
         emit pdfObjectClicked(itemData->second);
+    }
+}
+
+void PDFDataView::listWidgetDoubleClicked(QListWidgetItem* item) {
+    auto itemData = mItems.find(item);
+
+    if (itemData != mItems.end() && itemData->second.object != nullptr) {
+        emit pdfObjectDoubleClicked(itemData->second);
     }
 }
 
