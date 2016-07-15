@@ -79,7 +79,21 @@ public:
 
 template<typename T>
 void PDFWalker::loadNumberObject(Object* source, PDFWalkerNumber<T>* dest) {
-    QString value = QString("%1").arg(source->getInt());
+    static_assert(std::is_arithmetic<T>::value, "None numerical type.");
+
+    T num;
+
+    if (std::is_integral<T>::value) {
+        if (sizeof(T) == sizeof(int))
+            num = source->getInt();
+        if (sizeof(T) == sizeof(long long))
+            num = source->getInt64();
+    }
+
+    if (std::is_floating_point<T>::value)
+        num = source->getReal();
+
+    QString value = QString("%1").arg(num);
     dest->setValue(value);
 }
 

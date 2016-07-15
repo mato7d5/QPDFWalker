@@ -46,9 +46,9 @@ PDFWalker::~PDFWalker() {
 QString PDFWalker::objTypeString(ObjType type) {
     switch (type) {
     case objBool:
-        return "Boolean";
+        return "Bool";
     case objInt:
-        return "Integer";
+        return "Int";
     case objReal:
         return "Real";
     case objString:
@@ -60,13 +60,13 @@ QString PDFWalker::objTypeString(ObjType type) {
     case objArray:
         return "Array";
     case objDict:
-        return "Dictionary";
+        return "Dict";
     case objStream:
         return "Stream";
     case objRef:
-        return "Reference";
+        return "Ref";
     case objCmd:
-        return "Command name";
+        return "Cmd name";
     case objError:
         return "Error";
     case objEOF:
@@ -74,7 +74,7 @@ QString PDFWalker::objTypeString(ObjType type) {
     case objNone:
         return "None";
     case objInt64:
-        return "Integer 64 (Poppler object)";
+        return "Int64";
     default:
         return "";
     }
