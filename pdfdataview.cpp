@@ -16,6 +16,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 #include "pdfdataview.h"
 #include <QVBoxLayout>
+#include <QSizePolicy>
 #include <utility>
 
 PDFDataView::PDFDataView(QWidget *parent) : QWidget(parent)
@@ -33,6 +34,8 @@ PDFDataView::PDFDataView(QWidget *parent) : QWidget(parent)
 
     connect(mListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listWidgetClicked(QListWidgetItem*)));
     connect(mListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listWidgetDoubleClicked(QListWidgetItem*)));
+
+//    setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
     setLayout(layout);
 }

@@ -29,9 +29,16 @@ WalkerWindow::WalkerWindow(std::shared_ptr<PDFWalker> walker, QWidget *parent) :
 {
     ui->setupUi(this);
 
+    mViewPort = new QWidget(this);
+    mLayout = new QHBoxLayout();
+    mViewPort->setLayout(mLayout);
+
+    ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->scrollArea->setWidget(mViewPort);
+
     for (int i = 0; i < mViewWindowCount; ++i) {
         PDFDataView* view = new PDFDataView(this);
-        ui->horizontalLayout->addWidget(view);
+        mLayout->addWidget(view);
 
         mDataViews.push_back(view);
     }
@@ -73,7 +80,7 @@ void WalkerWindow::addNewViewWindow() {
     ++mViewWindowCount;
 
     PDFDataView* view = new PDFDataView(this);
-    ui->horizontalLayout->addWidget(view);
+    mLayout->addWidget(view);
     mDataViews.push_back(view);
 }
 
@@ -184,6 +191,8 @@ void WalkerWindow::objectToView(PDFWalkerObject* object) {
         }
 
         mDataViews[mNextViewWindowIndex]->setCaption(title);
+
+        ui->scrollArea->ensureWidgetVisible(mDataViews[mNextViewWindowIndex]);
 
         connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectClicked(const ViewItemData&)), this, SLOT(pdfObjectClickedSlot(const ViewItemData&)), Qt::UniqueConnection);
         ++mNextViewWindowIndex;

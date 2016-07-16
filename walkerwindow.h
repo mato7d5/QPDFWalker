@@ -20,6 +20,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <QDialog>
 #include <QString>
 #include <QList>
+#include <QHBoxLayout>
 #include <memory>
 #include "pdfwalker.h"
 #include "pdfdataview.h"
@@ -38,6 +39,8 @@ private:
     QList<PDFDataView*> mDataViews;
     int mViewWindowCount;
     int mNextViewWindowIndex;
+    QWidget* mViewPort;
+    QHBoxLayout* mLayout;
 
     void addNewViewWindow();
     void objectToView(PDFWalkerObject* object);
