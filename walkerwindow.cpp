@@ -205,7 +205,7 @@ void WalkerWindow::objectToView(PDFWalkerObject* object) {
         mDataViews[mNextViewWindowIndex]->setCaption(title);
         mViewPort->setLastWindowIndex(mNextViewWindowIndex);
 
-        if (viewPortResized)
+        if (!viewPortResized)
             ui->scrollArea->ensureWidgetVisible(mDataViews[mNextViewWindowIndex]);
 
         connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectClicked(const ViewItemData&)), this, SLOT(pdfObjectClickedSlot(const ViewItemData&)), Qt::UniqueConnection);
