@@ -25,6 +25,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "pdfwalker.h"
 #include "pdfdataview.h"
 #include "pdfwalkerobject.h"
+#include "scrollareaviewport.h"
 #include "global.h"
 
 namespace Ui {
@@ -39,7 +40,7 @@ private:
     QList<PDFDataView*> mDataViews;
     int mViewWindowCount;
     int mNextViewWindowIndex;
-    QWidget* mViewPort;
+    ScrollAreaViewPort* mViewPort;
     QHBoxLayout* mLayout;
 
     void addNewViewWindow();
@@ -58,6 +59,7 @@ private:
 private slots:
     void pdfObjectClickedSlot(const ViewItemData& data);
     void pdfObjectDoubleClickedSlot(const ViewItemData& data);
+    void lastViewWindowIndexSlot(int idx);
 };
 
 #endif // WALKERWINDOW_H

@@ -19,6 +19,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "streamdatadialog.h"
 #include <QList>
 #include <QListWidgetItem>
+#include <QScrollBar>
 
 WalkerWindow::WalkerWindow(std::shared_ptr<PDFWalker> walker, QWidget *parent) :
     QDialog(parent),
@@ -29,12 +30,15 @@ WalkerWindow::WalkerWindow(std::shared_ptr<PDFWalker> walker, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    mViewPort = new QWidget(this);
+    mViewPort = new ScrollAreaViewPort(this);
     mLayout = new QHBoxLayout();
+
     mViewPort->setLayout(mLayout);
 
     ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->scrollArea->setWidget(mViewPort);
+
+    connect(mViewPort, SIGNAL(lastWindowIndexChanged(int)), this, SLOT(lastViewWindowIndexSlot(int)), Qt::UniqueConnection);
 
     for (int i = 0; i < mViewWindowCount; ++i) {
         PDFDataView* view = new PDFDataView(this);
@@ -75,6 +79,10 @@ void WalkerWindow::pdfObjectDoubleClickedSlot(const ViewItemData& data) {
     }
 }
 
+void WalkerWindow::lastViewWindowIndexSlot(int idx) {
+    ui->scrollArea->ensureWidgetVisible(mDataViews[idx]);
+}
+
 //methods
 void WalkerWindow::addNewViewWindow() {
     ++mViewWindowCount;
@@ -85,8 +93,12 @@ void WalkerWindow::addNewViewWindow() {
 }
 
 void WalkerWindow::objectToView(PDFWalkerObject* object) {
-    if (mNextViewWindowIndex == mViewWindowCount)
+    bool viewPortResized = false;
+
+    if (mNextViewWindowIndex == mViewWindowCount) {
         addNewViewWindow();
+        viewPortResized = true;
+    }
 
     for (int i = mNextViewWindowIndex; i < mDataViews.size(); ++i)
         mDataViews[i]->clearView();
@@ -191,8 +203,10 @@ void WalkerWindow::objectToView(PDFWalkerObject* object) {
         }
 
         mDataViews[mNextViewWindowIndex]->setCaption(title);
+        mViewPort->setLastWindowIndex(mNextViewWindowIndex);
 
-        ui->scrollArea->ensureWidgetVisible(mDataViews[mNextViewWindowIndex]);
+        if (viewPortResized)
+            ui->scrollArea->ensureWidgetVisible(mDataViews[mNextViewWindowIndex]);
 
         connect(mDataViews[mNextViewWindowIndex], SIGNAL(pdfObjectClicked(const ViewItemData&)), this, SLOT(pdfObjectClickedSlot(const ViewItemData&)), Qt::UniqueConnection);
         ++mNextViewWindowIndex;

@@ -19,13 +19,17 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <QSizePolicy>
 #include <utility>
 
+#define DATA_VIEW_WIDTH     120
+#define DATA_VIEW_HEIGHT    160
+
 PDFDataView::PDFDataView(QWidget *parent) : QWidget(parent)
 {
     mLabel = new QLabel(this);
     mListWidget = new QListWidget(this);
 
-    mLabel->resize(200, mLabel->height());
-    mListWidget->resize(200, 200);
+    mLabel->setMaximumSize(DATA_VIEW_WIDTH, mLabel->height());
+    mListWidget->setMaximumSize(DATA_VIEW_WIDTH, DATA_VIEW_HEIGHT);
+    mListWidget->setMinimumSize(DATA_VIEW_WIDTH, DATA_VIEW_HEIGHT);
 
     QVBoxLayout* layout = new QVBoxLayout;
 
@@ -34,8 +38,6 @@ PDFDataView::PDFDataView(QWidget *parent) : QWidget(parent)
 
     connect(mListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listWidgetClicked(QListWidgetItem*)));
     connect(mListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listWidgetDoubleClicked(QListWidgetItem*)));
-
-//    setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
     setLayout(layout);
 }
