@@ -16,43 +16,43 @@ QMAKE_CXXFLAGS += -std=c++14
 
 INCLUDEPATH += /usr/include/poppler
 
-SOURCES += main.cpp\
-        maindialog.cpp \
-    walkerwindow.cpp \
-    pdfwalker.cpp \
-    pdfdataview.cpp \
-    pdfwalkerobject.cpp \
-    pdfwalkerdictionary.cpp \
-    pdfwalkername.cpp \
-    pdfwalkerarray.cpp \
-    pdfwalkerstring.cpp \
-    pdfwalkerboolean.cpp \
-    pdfwalkerstream.cpp \
-    streamdatadialog.cpp \
-    scrollareaviewport.cpp \
-    aboutdialog.cpp
+SOURCES += src/main.cpp\
+        src/maindialog.cpp \
+    src/walkerwindow.cpp \
+    src/pdfwalker.cpp \
+    src/pdfdataview.cpp \
+    src/pdfwalkerobject.cpp \
+    src/pdfwalkerdictionary.cpp \
+    src/pdfwalkername.cpp \
+    src/pdfwalkerarray.cpp \
+    src/pdfwalkerstring.cpp \
+    src/pdfwalkerboolean.cpp \
+    src/pdfwalkerstream.cpp \
+    src/streamdatadialog.cpp \
+    src/scrollareaviewport.cpp \
+    src/aboutdialog.cpp
 
-HEADERS  += maindialog.h \
-    walkerwindow.h \
-    pdfwalker.h \
-    pdfdataview.h \
-    global.h \
-    pdfwalkerobject.h \
-    pdfwalkerdictionary.h \
-    pdfwalkername.h \
-    pdfwalkerarray.h \
-    pdfwalkerstring.h \
-    pdfwalkernumber.h \
-    pdfwalkerboolean.h \
-    pdfwalkerstream.h \
-    streamdatadialog.h \
-    scrollareaviewport.h \
-    aboutdialog.h
+HEADERS  += src/maindialog.h \
+    src/walkerwindow.h \
+    src/pdfwalker.h \
+    src/pdfdataview.h \
+    src/global.h \
+    src/pdfwalkerobject.h \
+    src/pdfwalkerdictionary.h \
+    src/pdfwalkername.h \
+    src/pdfwalkerarray.h \
+    src/pdfwalkerstring.h \
+    src/pdfwalkernumber.h \
+    src/pdfwalkerboolean.h \
+    src/pdfwalkerstream.h \
+    src/streamdatadialog.h \
+    src/scrollareaviewport.h \
+    src/aboutdialog.h
 
-FORMS    += maindialog.ui \
-    walkerwindow.ui \
-    streamdatadialog.ui \
-    aboutdialog.ui
+FORMS    += src/maindialog.ui \
+    src/walkerwindow.ui \
+    src/streamdatadialog.ui \
+    src/aboutdialog.ui
 
 LIBS += -lpoppler
 
