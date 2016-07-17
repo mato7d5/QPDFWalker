@@ -14,37 +14,28 @@ with this program; if not, write to the
 Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef MAINDIALOG_H
-#define MAINDIALOG_H
+#ifndef ABOUTDIALOG_H
+#define ABOUTDIALOG_H
 
 #include <QDialog>
-#include <QList>
-#include <QString>
 
 namespace Ui {
-class MainDialog;
+class AboutDialog;
 }
 
-class MainDialog : public QDialog
+class AboutDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit MainDialog(QWidget *parent = 0);
-    ~MainDialog();
+    explicit AboutDialog(QWidget *parent = 0);
+    ~AboutDialog();
 
 private slots:
-    void on_uiOpenFile_clicked();
-
-    void on_uiCloseFile_clicked();
-
-    void on_uiWalk_clicked();
-
-    void on_uiAbout_clicked();
+    void on_closeBtn_clicked();
 
 private:
-    QList<QString> mPdfFiles;
-    Ui::MainDialog *ui;
+    Ui::AboutDialog *ui;
 };
 
-#endif // MAINDIALOG_H
+#endif // ABOUTDIALOG_H

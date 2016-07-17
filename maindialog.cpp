@@ -17,6 +17,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "maindialog.h"
 #include "ui_maindialog.h"
 #include "walkerwindow.h"
+#include "aboutdialog.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDir>
@@ -82,4 +83,10 @@ void MainDialog::on_uiWalk_clicked()
         QMessageBox::critical(this, tr("Error"), tr("Cannot open file."), QMessageBox::Ok);
     }
 
+}
+
+void MainDialog::on_uiAbout_clicked()
+{
+    AboutDialog dlg(this);
+    dlg.exec();
 }

@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     pdfwalkerboolean.cpp \
     pdfwalkerstream.cpp \
     streamdatadialog.cpp \
-    scrollareaviewport.cpp
+    scrollareaviewport.cpp \
+    aboutdialog.cpp
 
 HEADERS  += maindialog.h \
     walkerwindow.h \
@@ -45,10 +46,12 @@ HEADERS  += maindialog.h \
     pdfwalkerboolean.h \
     pdfwalkerstream.h \
     streamdatadialog.h \
-    scrollareaviewport.h
+    scrollareaviewport.h \
+    aboutdialog.h
 
 FORMS    += maindialog.ui \
     walkerwindow.ui \
-    streamdatadialog.ui
+    streamdatadialog.ui \
+    aboutdialog.ui
 
 LIBS += -lpoppler
