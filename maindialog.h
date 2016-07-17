@@ -42,6 +42,8 @@ private slots:
 
     void on_uiAbout_clicked();
 
+    void on_uiQuit_clicked();
+
 private:
     QList<QString> mPdfFiles;
     Ui::MainDialog *ui;

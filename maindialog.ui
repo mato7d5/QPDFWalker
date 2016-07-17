@@ -59,6 +59,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="uiQuit">
+         <property name="text">
+          <string>&amp;Quit</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="uiAbout">
          <property name="text">
           <string>&amp;About</string>

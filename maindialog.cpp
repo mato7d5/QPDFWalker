@@ -90,3 +90,8 @@ void MainDialog::on_uiAbout_clicked()
     AboutDialog dlg(this);
     dlg.exec();
 }
+
+void MainDialog::on_uiQuit_clicked()
+{
+    qApp->exit();
+}
