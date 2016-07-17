@@ -55,3 +55,6 @@ FORMS    += maindialog.ui \
     aboutdialog.ui
 
 LIBS += -lpoppler
+
+RESOURCES += \
+    resources.qrc

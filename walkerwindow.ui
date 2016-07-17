@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>QPDFWalker</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/app_icon</normaloff>:/icons/app_icon</iconset>
+  </property>
   <property name="modal">
    <bool>true</bool>
   </property>
@@ -39,6 +43,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
