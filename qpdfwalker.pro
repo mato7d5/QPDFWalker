@@ -57,4 +57,4 @@ FORMS    += src/maindialog.ui \
 LIBS += -lpoppler
 
 RESOURCES += \
-    resources.qrc
+    src/resources.qrc
