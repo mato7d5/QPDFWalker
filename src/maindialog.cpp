@@ -46,6 +46,7 @@ void MainDialog::on_uiOpenFile_clicked()
     if (!fileName.isEmpty()) {
         mPdfFiles.append(fileName);
         ui->uiFilesList->addItem(fileName);
+        ui->uiCloseFile->setEnabled(true);
         ui->uiWalk->setEnabled(true);
     }
 }
@@ -62,8 +63,10 @@ void MainDialog::on_uiCloseFile_clicked()
         }
     }
 
-    if (mPdfFiles.isEmpty())
+    if (mPdfFiles.isEmpty()) {
+        ui->uiCloseFile->setEnabled(false);
         ui->uiWalk->setEnabled(false);
+    }
 }
 
 void MainDialog::on_uiWalk_clicked()
