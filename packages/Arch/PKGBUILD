@@ -1,7 +1,8 @@
 # Maintainer: Martin Mancuska <martin@borg.sk>
+
 _pkgname=QPDFWalker
 pkgname=$_pkgname-git
-pkgver=_git
+pkgver=dev1
 pkgrel=1
 pkgdesc="Tool for browsing hierarchy of low level objects in a PDF file."
 arch=('i686' 'x86_64')
@@ -19,5 +20,6 @@ build() {
 }
 
 package() {
-  make DESTDIR="$pkgdir/" install
+  cd "$srcdir/$_pkgname"
+  make install
 }
