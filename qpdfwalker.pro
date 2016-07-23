@@ -59,4 +59,5 @@ LIBS += -lpoppler
 RESOURCES += \
     src/resources.qrc
 
+target.path = /usr/local/bin/
 INSTALLS += target
