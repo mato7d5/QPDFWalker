@@ -69,6 +69,8 @@ public:
     PDFWalker(const std::string& fileName);
     ~PDFWalker();
 
+    const char* fileName() const { return mFileName->getCString(); }
+
     std::shared_ptr<PDFWalkerDictionary> trailerDictionary() { return mTrailerDictionary; }
 
     std::unique_ptr<PDFWalkerObject> pdfWalkerObject(int number, int gen);

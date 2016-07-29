@@ -48,6 +48,8 @@ WalkerWindow::WalkerWindow(std::shared_ptr<PDFWalker> walker, QWidget *parent) :
     }
 
     loadTrailer();
+
+    setWindowTitle(walker->fileName());
 }
 
 WalkerWindow::~WalkerWindow()
