@@ -45,6 +45,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="uiSaveToFileBtn">
+            <property name="text">
+             <string>&amp;Save</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

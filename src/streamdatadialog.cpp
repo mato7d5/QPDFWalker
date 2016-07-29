@@ -18,6 +18,11 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "ui_streamdatadialog.h"
 #include <QByteArray>
 #include <QClipboard>
+#include <QFileDialog>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
 
 StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *parent) :
     QDialog(parent),
@@ -53,4 +58,19 @@ void StreamDataDialog::on_uiClipboardBtn_clicked()
 {
     QClipboard* clipboard = QApplication::clipboard();
     clipboard->setText(ui->uiStreamData->toPlainText());
+}
+
+void StreamDataDialog::on_uiSaveToFileBtn_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save"), QDir::homePath(), tr("All Files (*.*"));
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, tr("Error"), tr("Cannot save stream data to the file"));
+        return;
+    }
+
+    QTextStream fileStream(&file);
+    fileStream << ui->uiStreamData->toPlainText();
+
+    file.close();
 }
