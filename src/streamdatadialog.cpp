@@ -17,6 +17,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "streamdatadialog.h"
 #include "ui_streamdatadialog.h"
 #include <QByteArray>
+#include <QClipboard>
 
 StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *parent) :
     QDialog(parent),
@@ -46,4 +47,10 @@ StreamDataDialog::~StreamDataDialog()
 void StreamDataDialog::on_uiCloseBtn_clicked()
 {
     close();
+}
+
+void StreamDataDialog::on_uiClipboardBtn_clicked()
+{
+    QClipboard* clipboard = QApplication::clipboard();
+    clipboard->setText(ui->uiStreamData->toPlainText());
 }

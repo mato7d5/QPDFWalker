@@ -37,6 +37,8 @@ public:
 private slots:
     void on_uiCloseBtn_clicked();
 
+    void on_uiClipboardBtn_clicked();
+
 private:
     Ui::StreamDataDialog *ui;
 };
