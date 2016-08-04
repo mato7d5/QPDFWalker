@@ -19,6 +19,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 #include "global.h"
 #include <QDialog>
+#include <QByteArray>
 
 namespace Ui {
 class StreamDataDialog;
@@ -29,6 +30,9 @@ class StreamDataDialog : public QDialog
     Q_OBJECT
 private:
     const ObjectSharedPtr& mStreamObj;
+    QByteArray mStreamData;
+
+    enum class DisplayMode { Text = 0, Base64 = 1 };
 
 public:
     explicit StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *parent = 0);
@@ -38,6 +42,8 @@ private slots:
     void on_uiCloseBtn_clicked();
     void on_uiClipboardBtn_clicked();
     void on_uiSaveToFileBtn_clicked();
+
+    void on_uiDisplayModeCombo_currentIndexChanged(int index);
 
 private:
     Ui::StreamDataDialog *ui;

@@ -31,17 +31,21 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
 {
     ui->setupUi(this);
 
+    //display mode combobox
+    ui->uiDisplayModeCombo->insertItem(static_cast<int> (DisplayMode::Text), tr("Text"));
+    ui->uiDisplayModeCombo->insertItem(static_cast<int> (DisplayMode::Base64), tr("Base64"));
+
     // load stream data
-    QByteArray ar;
     int c;
 
     mStreamObj->streamReset();
     while ((c = mStreamObj->streamGetChar()) != EOF)
-        ar.append(static_cast<char> (c));
+        mStreamData.append(static_cast<char> (c));
 
     mStreamObj->streamClose();
 
-    ui->uiStreamData->insertPlainText(ar.data());
+    ui->uiStreamData->insertPlainText(mStreamData.data());
+    ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
 }
 
 StreamDataDialog::~StreamDataDialog()
@@ -73,4 +77,23 @@ void StreamDataDialog::on_uiSaveToFileBtn_clicked()
     fileStream << ui->uiStreamData->toPlainText();
 
     file.close();
+}
+
+void StreamDataDialog::on_uiDisplayModeCombo_currentIndexChanged(int index)
+{
+    DisplayMode mode = static_cast<DisplayMode> (index);
+
+    switch (mode) {
+    case DisplayMode::Text:
+        ui->uiStreamData->clear();
+        ui->uiStreamData->insertPlainText(mStreamData.data());
+        break;
+
+    case DisplayMode::Base64:
+        ui->uiStreamData->clear();
+        ui->uiStreamData->insertPlainText(mStreamData.toBase64());
+        break;
+    default:
+        break;
+    }
 }

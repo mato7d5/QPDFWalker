@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>572</width>
     <height>334</height>
    </rect>
   </property>
@@ -49,6 +49,22 @@
            <widget class="QPushButton" name="uiSaveToFileBtn">
             <property name="text">
              <string>&amp;Save</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="uiDisplayGroup">
+         <property name="title">
+          <string>Display:</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QComboBox" name="uiDisplayModeCombo">
+            <property name="currentIndex">
+             <number>-1</number>
             </property>
            </widget>
           </item>
