@@ -34,6 +34,7 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
     //display mode combobox
     ui->uiDisplayModeCombo->insertItem(static_cast<int> (DisplayMode::Text), tr("Text"));
     ui->uiDisplayModeCombo->insertItem(static_cast<int> (DisplayMode::Base64), tr("Base64"));
+    ui->uiDisplayModeCombo->insertItem(static_cast<int> (DisplayMode::Hex), tr("Hex"));
 
     // load stream data
     int c;
@@ -92,6 +93,10 @@ void StreamDataDialog::on_uiDisplayModeCombo_currentIndexChanged(int index)
     case DisplayMode::Base64:
         ui->uiStreamData->clear();
         ui->uiStreamData->insertPlainText(mStreamData.toBase64());
+        break;
+    case DisplayMode::Hex:
+        ui->uiStreamData->clear();
+        ui->uiStreamData->insertPlainText(mStreamData.toHex());
         break;
     default:
         break;

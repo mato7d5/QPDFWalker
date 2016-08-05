@@ -32,7 +32,7 @@ private:
     const ObjectSharedPtr& mStreamObj;
     QByteArray mStreamData;
 
-    enum class DisplayMode { Text = 0, Base64 = 1 };
+    enum class DisplayMode { Text = 0, Base64 = 1, Hex = 2 };
 
 public:
     explicit StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *parent = 0);
