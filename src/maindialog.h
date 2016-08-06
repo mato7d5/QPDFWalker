@@ -21,6 +21,8 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <QList>
 #include <QString>
 
+class QListWidgetItem;
+
 namespace Ui {
 class MainDialog;
 }
@@ -35,14 +37,11 @@ public:
 
 private slots:
     void on_uiOpenFile_clicked();
-
     void on_uiCloseFile_clicked();
-
     void on_uiWalk_clicked();
-
     void on_uiAbout_clicked();
-
     void on_uiQuit_clicked();
+    void on_uiFilesList_itemDoubleClicked(QListWidgetItem *item);
 
 private:
     QList<QString> mPdfFiles;

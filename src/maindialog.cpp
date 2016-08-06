@@ -98,3 +98,9 @@ void MainDialog::on_uiQuit_clicked()
 {
     qApp->exit();
 }
+
+void MainDialog::on_uiFilesList_itemDoubleClicked(QListWidgetItem *item)
+{
+    if (item)
+        on_uiWalk_clicked();
+}
