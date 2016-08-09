@@ -22,7 +22,6 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <string>
 #include <memory>
 #include <utility>
-#include <exception>
 
 #include <QString>
 #include <QList>
@@ -36,17 +35,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "pdfwalkernumber.h"
 #include "pdfwalkerboolean.h"
 #include "pdfwalkerstream.h"
-
-class PDFWalkerException : public std::exception {
-private:
-    std::string msg;
-
-public:
-    PDFWalkerException(const std::string& inMsg) : msg(inMsg) { }
-    ~PDFWalkerException() { }
-
-    const char* what() const noexcept override { return msg.c_str(); }
-};
+#include "pdfwalkerexception.h"
 
 class PDFWalker final
 {

@@ -47,7 +47,8 @@ HEADERS  += src/maindialog.h \
     src/pdfwalkerstream.h \
     src/streamdatadialog.h \
     src/scrollareaviewport.h \
-    src/aboutdialog.h
+    src/aboutdialog.h \
+    src/pdfwalkerexception.h
 
 FORMS    += src/maindialog.ui \
     src/walkerwindow.ui \
