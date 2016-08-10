@@ -29,7 +29,6 @@ class StreamDataDialog : public QDialog
 {
     Q_OBJECT
 private:
-    const ObjectSharedPtr& mStreamObj;
     QByteArray mStreamData;
 
     enum class DisplayMode { Text = 0, Base64 = 1, Hex = 2 };

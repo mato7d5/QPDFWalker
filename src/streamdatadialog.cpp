@@ -26,7 +26,6 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *parent) :
     QDialog(parent),
-    mStreamObj(streamObj),
     ui(new Ui::StreamDataDialog)
 {
     ui->setupUi(this);
@@ -39,14 +38,17 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
     // load stream data
     int c;
 
-    mStreamObj->streamReset();
-    while ((c = mStreamObj->streamGetChar()) != EOF)
+    streamObj->streamReset();
+    while ((c = streamObj->streamGetChar()) != EOF)
         mStreamData.append(static_cast<char> (c));
 
-    mStreamObj->streamClose();
+    streamObj->streamClose();
 
     ui->uiStreamData->insertPlainText(mStreamData.data());
     ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
+
+    ui->uiEncodedLength->setText(QString("%1").arg(streamObj->getStream()->getBaseStream()->getLength()));
+    ui->uiDecodedLength->setText(QString("%1").arg(mStreamData.length()));
 }
 
 StreamDataDialog::~StreamDataDialog()
