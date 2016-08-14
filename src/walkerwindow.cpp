@@ -222,7 +222,6 @@ void WalkerWindow::loadTrailer() {
     }
 
     auto trailerDict = mWalker->trailerDictionary();
-    QString title = QString::fromUtf8("Trailer");
     objectToView(trailerDict.get());
 }
 
