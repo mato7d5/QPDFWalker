@@ -32,6 +32,7 @@ private:
     QByteArray mStreamData;
 
     enum class DisplayMode { Text = 0, Base64 = 1, Hex = 2 };
+    enum class DisplayEncoding { Latin1 = 0, Unicode = 1, PDFDocEncoding = 2, Ascii = 3 };
 
 public:
     explicit StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *parent = 0);
@@ -41,8 +42,9 @@ private slots:
     void on_uiCloseBtn_clicked();
     void on_uiClipboardBtn_clicked();
     void on_uiSaveToFileBtn_clicked();
-
     void on_uiDisplayModeCombo_currentIndexChanged(int index);
+
+    void on_uiDisplayEncodingCombo_currentIndexChanged(int index);
 
 private:
     Ui::StreamDataDialog *ui;

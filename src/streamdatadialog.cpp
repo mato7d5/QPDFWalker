@@ -35,6 +35,12 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
     ui->uiDisplayModeCombo->insertItem(static_cast<int> (DisplayMode::Base64), tr("Base64"));
     ui->uiDisplayModeCombo->insertItem(static_cast<int> (DisplayMode::Hex), tr("Hex"));
 
+    //display encoding combobox
+    ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::Latin1), tr("Latin1"));
+    ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::Unicode), tr("Unicode"));
+    ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::PDFDocEncoding), tr("PDFDocEncoding"));
+    ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::Ascii), tr("Ascii"));
+
     // load stream data
     int c;
 
@@ -46,6 +52,7 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
 
     ui->uiStreamData->insertPlainText(mStreamData.data());
     ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
+    ui->uiDisplayEncodingCombo->setCurrentIndex(static_cast<int> (DisplayEncoding::Latin1));
 
     ui->uiEncodedLength->setText(QString("%1").arg(streamObj->getStream()->getBaseStream()->getLength()));
     ui->uiDecodedLength->setText(QString("%1").arg(mStreamData.length()));
@@ -99,6 +106,29 @@ void StreamDataDialog::on_uiDisplayModeCombo_currentIndexChanged(int index)
     case DisplayMode::Hex:
         ui->uiStreamData->clear();
         ui->uiStreamData->insertPlainText(mStreamData.toHex());
+        break;
+    default:
+        break;
+    }
+}
+
+void StreamDataDialog::on_uiDisplayEncodingCombo_currentIndexChanged(int index)
+{
+    DisplayEncoding encoding = static_cast<DisplayEncoding> (index);
+
+    switch (encoding) {
+    case DisplayEncoding::Latin1:
+    case DisplayEncoding::PDFDocEncoding:
+        ui->uiStreamData->clear();
+        ui->uiStreamData->insertPlainText(QString::fromLatin1(mStreamData.data()));
+        break;
+    case DisplayEncoding::Unicode:
+        ui->uiStreamData->clear();
+        ui->uiStreamData->insertPlainText(QString::fromUtf16(reinterpret_cast<ushort*> (mStreamData.data())));
+        break;
+    case DisplayEncoding::Ascii:
+        ui->uiStreamData->clear();
+        ui->uiStreamData->insertPlainText(QString::fromStdString(mStreamData.data()));
         break;
     default:
         break;
