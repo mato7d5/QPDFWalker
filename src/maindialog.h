@@ -33,6 +33,9 @@ class MainDialog : public QDialog
     Q_OBJECT
 private:
     QSettings mSettings;
+    QList<QString> mPdfFiles;
+    Ui::MainDialog *ui;
+    QString mLastOpenedDir;
 
 public:
     explicit MainDialog(QWidget *parent = 0);
@@ -45,10 +48,6 @@ private slots:
     void on_uiAbout_clicked();
     void on_uiQuit_clicked();
     void on_uiFilesList_itemDoubleClicked(QListWidgetItem *item);
-
-private:
-    QList<QString> mPdfFiles;
-    Ui::MainDialog *ui;
 };
 
 #endif // MAINDIALOG_H

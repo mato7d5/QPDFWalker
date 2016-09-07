@@ -21,6 +21,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDir>
+#include <QFileInfo>
 
 #include <memory>
 #include <utility>
@@ -30,7 +31,8 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 MainDialog::MainDialog(QWidget *parent) :
     QDialog(parent),
     mSettings("QPDFWalker", "QPDFWalker"),
-    ui(new Ui::MainDialog)
+    ui(new Ui::MainDialog),
+    mLastOpenedDir(QDir::homePath())
 {
     ui->setupUi(this);
 }
@@ -42,13 +44,18 @@ MainDialog::~MainDialog()
 
 void MainDialog::on_uiOpenFile_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select PDF File"), QDir::homePath(), tr("pdf files (*.pdf)"));
+    if (!QDir(mLastOpenedDir).exists())
+        mLastOpenedDir = QDir::homePath();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select PDF File"), mLastOpenedDir, tr("pdf files (*.pdf)"));
 
     if (!fileName.isEmpty()) {
         mPdfFiles.append(fileName);
         ui->uiFilesList->addItem(fileName);
         ui->uiCloseFile->setEnabled(true);
         ui->uiWalk->setEnabled(true);
+
+        mLastOpenedDir = QFileInfo(fileName).absoluteDir().absolutePath();
     }
 }
 
