@@ -29,6 +29,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 MainDialog::MainDialog(QWidget *parent) :
     QDialog(parent),
+    mSettings("QPDFWalker", "QPDFWalker"),
     ui(new Ui::MainDialog)
 {
     ui->setupUi(this);

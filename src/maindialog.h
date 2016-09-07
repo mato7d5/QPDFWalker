@@ -20,6 +20,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <QDialog>
 #include <QList>
 #include <QString>
+#include <QSettings>
 
 class QListWidgetItem;
 
@@ -30,6 +31,8 @@ class MainDialog;
 class MainDialog : public QDialog
 {
     Q_OBJECT
+private:
+    QSettings mSettings;
 
 public:
     explicit MainDialog(QWidget *parent = 0);
