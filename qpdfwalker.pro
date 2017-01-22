@@ -30,7 +30,8 @@ SOURCES += src/main.cpp\
     src/pdfwalkerstream.cpp \
     src/streamdatadialog.cpp \
     src/scrollareaviewport.cpp \
-    src/aboutdialog.cpp
+    src/aboutdialog.cpp \
+    passworddialog.cpp
 
 HEADERS  += src/maindialog.h \
     src/walkerwindow.h \
@@ -48,12 +49,14 @@ HEADERS  += src/maindialog.h \
     src/streamdatadialog.h \
     src/scrollareaviewport.h \
     src/aboutdialog.h \
-    src/pdfwalkerexception.h
+    src/pdfwalkerexception.h \
+    passworddialog.h
 
 FORMS    += src/maindialog.ui \
     src/walkerwindow.ui \
     src/streamdatadialog.ui \
-    src/aboutdialog.ui
+    src/aboutdialog.ui \
+    passworddialog.ui
 
 LIBS += -lpoppler
 
