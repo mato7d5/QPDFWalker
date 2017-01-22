@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Mancuska <martin@borg.sk>
+Copyright 2016 - 2017 Martin Mancuska <martin@borg.sk>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -15,14 +15,34 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 */
 
 #include "pdfwalker.h"
+#include "passworddialog.h"
 #include <XRef.h>
 #include <Stream.h>
 #include <utility>
+
+#include <QString>
 
 PDFWalker::PDFWalker(const std::string& fileName) {
     mFileName = new GooString(fileName.c_str());
 
     mPDFDoc = std::make_unique<PDFDoc> (mFileName);
+    int i = 0;
+    while (!mPDFDoc->isOk() && i < 3) {
+            PasswordDialog* dlg = new PasswordDialog;
+            if (dlg->exec() == QDialog::Rejected)
+                throw PDFWalkerException("Encrypted PDF. Please, enter password!");
+
+            GooString* password = new GooString(dlg->password().toStdString().c_str());
+
+            //check passwords
+            mPDFDoc.release();
+            mPDFDoc = std::make_unique<PDFDoc> (mFileName, password, password);
+
+            delete password;
+            delete dlg;
+            ++i;
+    }
+
     if (!mPDFDoc->isOk())
         throw PDFWalkerException("Cannot open file!");
 
@@ -39,7 +59,7 @@ PDFWalker::PDFWalker(const std::string& fileName) {
 }
 
 PDFWalker::~PDFWalker() {
-
+    mPDFDoc.release();
 }
 
 //methods
