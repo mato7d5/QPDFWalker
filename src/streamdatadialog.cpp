@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Mancuska <martin@borg.sk>
+Copyright 2016 - 2017 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -44,18 +44,46 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
     // load stream data
     int c;
 
-    streamObj->streamReset();
-    while ((c = streamObj->streamGetChar()) != EOF)
-        mStreamData.append(static_cast<char> (c));
+    Stream* stream = streamObj->getStream();
+    StreamKind streamKind = stream->getKind();
+    if (streamKind == StreamKind::strJBIG2
+        || streamKind == StreamKind::strJPX
+        || streamKind == StreamKind::strJBIG2
+        || streamKind == StreamKind::strCCITTFax
+        || streamKind == StreamKind::strDCT)
+    {
+        mStreamImage = true;
+    }
+    else {
+        mStreamImage = false;
+    }
 
-    streamObj->streamClose();
+    if (mStreamImage) {
+        ui->uiStreamData->setEnabled(false);
+        ui->uiDisplayEncodingCombo->setEnabled(false);
+        ui->uiDisplayModeCombo->setEnabled(false);
+        ui->uiDecodedLength->setText("N/A");
+        ui->uiClipboardBtn->setEnabled(false);
+        ui->uiSaveToFileBtn->setEnabled(false);
 
-    ui->uiStreamData->insertPlainText(mStreamData.data());
-    ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
-    ui->uiDisplayEncodingCombo->setCurrentIndex(static_cast<int> (DisplayEncoding::Latin1));
+        // TODO: show image
+       // ui->verticalLayout_2->replaceWidget();
+    }
+    else {
+        streamObj->streamReset();
+        while ((c = streamObj->streamGetChar()) != EOF)
+            mStreamData.append(static_cast<char> (c));
 
-    ui->uiEncodedLength->setText(QString("%1").arg(streamObj->getStream()->getBaseStream()->getLength()));
-    ui->uiDecodedLength->setText(QString("%1").arg(mStreamData.length()));
+        streamObj->streamClose();
+
+        ui->uiStreamData->insertPlainText(mStreamData.data());
+        ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
+        ui->uiDisplayEncodingCombo->setCurrentIndex(static_cast<int> (DisplayEncoding::Latin1));
+
+        ui->uiDecodedLength->setText(QString("%1").arg(mStreamData.length()));
+    }
+
+    ui->uiEncodedLength->setText(QString("%1").arg(stream->getBaseStream()->getLength()));
 }
 
 StreamDataDialog::~StreamDataDialog()

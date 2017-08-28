@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Mancuska <martin@borg.sk>
+Copyright 2016 - 2017 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -30,6 +30,7 @@ class StreamDataDialog : public QDialog
     Q_OBJECT
 private:
     QByteArray mStreamData;
+    bool mStreamImage;
 
     enum class DisplayMode { Text = 0, Base64 = 1, Hex = 2 };
     enum class DisplayEncoding { Latin1 = 0, Unicode = 1, PDFDocEncoding = 2, Ascii = 3 };
