@@ -188,7 +188,8 @@ void WalkerWindow::objectToView(PDFWalkerObject* object) {
             PDFWalkerStream* streamObj = static_cast<PDFWalkerStream*> (object);
             ObjectSharedPtr value = streamObj->value();
             ObjectSharedPtr valueCopy = std::make_shared<Object> ();
-            value->copy(valueCopy.get());
+            //value->copy(valueCopy.get());
+            *valueCopy = value->copy();
 
             QListWidgetItem* dataWI = new QListWidgetItem("[Data]");
             ViewItemData dataWID = { valueCopy, mNextViewWindowIndex };

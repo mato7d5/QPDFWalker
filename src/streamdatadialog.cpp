@@ -23,9 +23,12 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QScrollArea>
+#include <QPixmap>
 
 StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *parent) :
     QDialog(parent),
+    mStreamImage(false),
     ui(new Ui::StreamDataDialog)
 {
     ui->setupUi(this);
@@ -41,35 +44,103 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
     ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::PDFDocEncoding), tr("PDFDocEncoding"));
     ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::Ascii), tr("Ascii"));
 
-    // load stream data
-    int c;
-
     Stream* stream = streamObj->getStream();
-    StreamKind streamKind = stream->getKind();
-    if (streamKind == StreamKind::strJBIG2
-        || streamKind == StreamKind::strJPX
-        || streamKind == StreamKind::strJBIG2
-        || streamKind == StreamKind::strCCITTFax
-        || streamKind == StreamKind::strDCT)
+    Dict* streamDict = stream->getDict();
+    ObjectUniquePtr subtype = std::make_unique<Object> ();
+    *subtype = streamDict->lookup("Subtype");
+
+    if (subtype->isName())
     {
-        mStreamImage = true;
+        std::string name = subtype->getName();
+        if (name == "Image")
+            mStreamImage = true;
     }
-    else {
-        mStreamImage = false;
-    }
+
+    bool imageLoaded = false;
 
     if (mStreamImage) {
-        ui->uiStreamData->setEnabled(false);
-        ui->uiDisplayEncodingCombo->setEnabled(false);
-        ui->uiDisplayModeCombo->setEnabled(false);
-        ui->uiDecodedLength->setText("N/A");
-        ui->uiClipboardBtn->setEnabled(false);
-        ui->uiSaveToFileBtn->setEnabled(false);
+        QPixmap image;
+        StreamKind kind = stream->getKind();
 
-        // TODO: show image
-       // ui->verticalLayout_2->replaceWidget();
+        if (kind == StreamKind::strDCT) {
+            Stream* nextStream = stream->getNextStream();
+
+            if (nextStream) {
+                auto size = nextStream->getBaseStream()->getLength();
+                Guchar* buf = new Guchar[size];
+                nextStream->doGetChars(size, buf);
+
+                imageLoaded = image.loadFromData(buf, size);
+
+                if (imageLoaded) {
+                    ui->uiStreamData->setEnabled(false);
+                    ui->uiDisplayEncodingCombo->setEnabled(false);
+                    ui->uiDisplayModeCombo->setEnabled(false);
+                    ui->uiDecodedLength->setText("N/A");
+                    ui->uiClipboardBtn->setEnabled(false);
+                    ui->uiSaveToFileBtn->setEnabled(false);
+
+                    QLabel* imageViewer = new QLabel(this);
+                    QScrollArea* scrollArea = new QScrollArea;
+
+                    imageViewer->setBackgroundRole(QPalette::Base);
+                    imageViewer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+                    imageViewer->setScaledContents(true);
+
+                    scrollArea->setBackgroundRole(QPalette::Dark);
+                    scrollArea->setWidget(imageViewer);
+
+                    imageViewer->setPixmap(image);
+                    imageViewer->adjustSize();
+
+                    ui->verticalLayout_2->replaceWidget(ui->uiStreamData, scrollArea);
+                    ui->uiStreamData->setVisible(false);
+                }
+
+                delete[] buf;
+            }
+        }
+        else if (kind == StreamKind::strJPX) {
+            Stream* nextStream = stream->getNextStream();
+            auto size = nextStream->getBaseStream()->getLength();
+            Guchar* buf = new Guchar[size];
+            nextStream->doGetChars(size, buf);
+
+            imageLoaded = image.loadFromData(buf, size);
+
+            if (imageLoaded) {
+                ui->uiStreamData->setEnabled(false);
+                ui->uiDisplayEncodingCombo->setEnabled(false);
+                ui->uiDisplayModeCombo->setEnabled(false);
+                ui->uiDecodedLength->setText("N/A");
+                ui->uiClipboardBtn->setEnabled(false);
+                ui->uiSaveToFileBtn->setEnabled(false);
+
+                QLabel* imageViewer = new QLabel(this);
+                QScrollArea* scrollArea = new QScrollArea;
+
+                imageViewer->setBackgroundRole(QPalette::Base);
+                imageViewer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+                imageViewer->setScaledContents(true);
+
+                scrollArea->setBackgroundRole(QPalette::Dark);
+                scrollArea->setWidget(imageViewer);
+
+                imageViewer->setPixmap(image);
+                imageViewer->adjustSize();
+
+                ui->verticalLayout_2->replaceWidget(ui->uiStreamData, scrollArea);
+                ui->uiStreamData->setVisible(false);
+            }
+
+            delete[] buf;
+        }
     }
-    else {
+
+    if (!imageLoaded) {
+        // load the stream data
+        int c;
+
         streamObj->streamReset();
         while ((c = streamObj->streamGetChar()) != EOF)
             mStreamData.append(static_cast<char> (c));

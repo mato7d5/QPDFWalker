@@ -51,7 +51,7 @@ PDFWalker::PDFWalker(const std::string& fileName) {
     Object* trailer = xref->getTrailerDict();
 
     ObjectSharedPtr trailerCopy = std::make_shared<Object> ();
-    trailer->copy(trailerCopy.get());
+    *trailerCopy = trailer->copy();
 
     auto trailerDict = pdfWalkerObject(trailerCopy);
 
@@ -107,7 +107,7 @@ void PDFWalker::loadDictionaryObject(Object* source, PDFWalkerDictionary* dest) 
         PDFWalkerDictionary::DictionaryData data;
         data.key = source->dictGetKey(i);
         ObjectSharedPtr value = std::make_shared<Object> ();
-        source->dictGetValNF(i, value.get());
+        *value = source->dictGetValNF(i);
         data.value = value;
 
         dest->addItem(data);
@@ -122,7 +122,7 @@ void PDFWalker::loadNameObject(Object* source, PDFWalkerName* dest) {
 void PDFWalker::loadArrayObject(Object* source, PDFWalkerArray* dest) {
     for (int i = 0; i < source->arrayGetLength(); ++i) {
         ObjectSharedPtr object = std::make_shared<Object> ();
-        source->arrayGetNF(i, object.get());
+        *object = source->arrayGetNF(i);
 
         dest->addItem(object);
     }
@@ -139,7 +139,7 @@ void PDFWalker::loadBooleanObject(Object* source, PDFWalkerBoolean* dest) {
 
 void PDFWalker::loadStreamObject(Object* source, PDFWalkerStream* dest) {
     Object* sourceCopy = new Object;
-    source->copy(sourceCopy);
+    *sourceCopy = source->copy();
     dest->setValue(sourceCopy);
 }
 
@@ -148,9 +148,10 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen)
 
     XRef* xref = mPDFDoc->getXRef();
     Object obj;
-    obj.initNull();
+    obj.setToNull();
 
-    if (xref->fetch(number, gen, &obj)) {
+    obj = xref->fetch(number, gen);
+    if (!obj.isNull()) {
         if (obj.isDict()) {
             ret.reset(new PDFWalkerDictionary());
             loadDictionaryObject(&obj, dynamic_cast<PDFWalkerDictionary*> (ret.get()));

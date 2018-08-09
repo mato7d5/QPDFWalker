@@ -27,7 +27,7 @@ PDFWalkerStream::PDFWalkerStream() : mObject(nullptr)
 
 PDFWalkerStream::~PDFWalkerStream() {
     if (mObject)
-        mObject->free();
+        mObject.reset();
 }
 
 //methods
@@ -45,7 +45,7 @@ std::shared_ptr<PDFWalkerDictionary> PDFWalkerStream::getStreamDict() {
         PDFWalkerDictionary::DictionaryData data;
         data.key = streamDict->getKey(i);
         ObjectSharedPtr value = std::make_shared<Object> ();
-        streamDict->getValNF(i, value.get());
+        *value = streamDict->getValNF(i);
         data.value = value;
 
         ret->addItem(data);
