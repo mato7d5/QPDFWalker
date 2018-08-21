@@ -14,7 +14,14 @@ TEMPLATE = app
 CONFIG += c++14
 QMAKE_CXXFLAGS += -std=c++14
 
-INCLUDEPATH += /usr/include/poppler
+unix:!macx {
+    INCLUDEPATH += /usr/include/poppler
+}
+macx: {
+    # assume that poppler was installed by brew and located on this path
+    INCLUDEPATH += /usr/local/opt/poppler/include/poppler
+    LIBS += -L/usr/local/opt/poppler/lib
+}
 
 SOURCES += src/main.cpp\
         src/maindialog.cpp \
