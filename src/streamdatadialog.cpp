@@ -1,5 +1,5 @@
 /*
-Copyright 2016 - 2017 Martin Mancuska <mmancuska@gmail.com>
+Copyright 2016 - 2018 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -68,6 +68,7 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
             if (nextStream) {
                 auto size = nextStream->getBaseStream()->getLength();
                 Guchar* buf = new Guchar[size];
+                nextStream->reset();
                 nextStream->doGetChars(size, buf);
 
                 imageLoaded = image.loadFromData(buf, size);
@@ -104,6 +105,43 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
             Stream* nextStream = stream->getNextStream();
             auto size = nextStream->getBaseStream()->getLength();
             Guchar* buf = new Guchar[size];
+            nextStream->reset();
+            nextStream->doGetChars(size, buf);
+
+            imageLoaded = image.loadFromData(buf, size);
+
+            if (imageLoaded) {
+                ui->uiStreamData->setEnabled(false);
+                ui->uiDisplayEncodingCombo->setEnabled(false);
+                ui->uiDisplayModeCombo->setEnabled(false);
+                ui->uiDecodedLength->setText("N/A");
+                ui->uiClipboardBtn->setEnabled(false);
+                ui->uiSaveToFileBtn->setEnabled(false);
+
+                QLabel* imageViewer = new QLabel(this);
+                QScrollArea* scrollArea = new QScrollArea;
+
+                imageViewer->setBackgroundRole(QPalette::Base);
+                imageViewer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+                imageViewer->setScaledContents(true);
+
+                scrollArea->setBackgroundRole(QPalette::Dark);
+                scrollArea->setWidget(imageViewer);
+
+                imageViewer->setPixmap(image);
+                imageViewer->adjustSize();
+
+                ui->verticalLayout_2->replaceWidget(ui->uiStreamData, scrollArea);
+                ui->uiStreamData->setVisible(false);
+            }
+
+            delete[] buf;
+        }
+        else if (kind == StreamKind::strJBIG2) {
+            Stream* nextStream = stream->getNextStream();
+            auto size = nextStream->getBaseStream()->getLength();
+            Guchar* buf = new Guchar[size];
+            nextStream->reset();
             nextStream->doGetChars(size, buf);
 
             imageLoaded = image.loadFromData(buf, size);
