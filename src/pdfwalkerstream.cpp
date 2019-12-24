@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Mancuska <martin@borg.sk>
+Copyright 2016 - 2019 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -45,7 +45,7 @@ std::shared_ptr<PDFWalkerDictionary> PDFWalkerStream::getStreamDict() {
         PDFWalkerDictionary::DictionaryData data;
         data.key = streamDict->getKey(i);
         ObjectSharedPtr value = std::make_shared<Object> ();
-        *value = streamDict->getValNF(i);
+        *value = streamDict->getValNF(i).copy();
         data.value = value;
 
         ret->addItem(data);

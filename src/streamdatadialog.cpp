@@ -1,5 +1,5 @@
 /*
-Copyright 2016 - 2018 Martin Mancuska <mmancuska@gmail.com>
+Copyright 2016 - 2019 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -67,7 +67,7 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
 
             if (nextStream) {
                 auto size = nextStream->getBaseStream()->getLength();
-                Guchar* buf = new Guchar[size];
+                uchar* buf = new uchar[size];
                 nextStream->reset();
                 nextStream->doGetChars(size, buf);
 
@@ -104,7 +104,7 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
         else if (kind == StreamKind::strJPX) {
             Stream* nextStream = stream->getNextStream();
             auto size = nextStream->getBaseStream()->getLength();
-            Guchar* buf = new Guchar[size];
+            uchar* buf = new uchar[size];
             nextStream->reset();
             nextStream->doGetChars(size, buf);
 
@@ -140,7 +140,7 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
         else if (kind == StreamKind::strJBIG2) {
             Stream* nextStream = stream->getNextStream();
             auto size = nextStream->getBaseStream()->getLength();
-            Guchar* buf = new Guchar[size];
+            uchar* buf = new uchar[size];
             nextStream->reset();
             nextStream->doGetChars(size, buf);
 

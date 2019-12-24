@@ -1,5 +1,5 @@
 /*
-Copyright 2016 - 2017 Martin Mancuska <martin@borg.sk>
+Copyright 2016 - 2019 Martin Mancuska <mmancuska@gmail.com.>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -107,7 +107,8 @@ void PDFWalker::loadDictionaryObject(Object* source, PDFWalkerDictionary* dest) 
         PDFWalkerDictionary::DictionaryData data;
         data.key = source->dictGetKey(i);
         ObjectSharedPtr value = std::make_shared<Object> ();
-        *value = source->dictGetValNF(i);
+        const Object& ret_obj = source->dictGetValNF(i);
+        *value = ret_obj.copy();
         data.value = value;
 
         dest->addItem(data);
@@ -122,14 +123,14 @@ void PDFWalker::loadNameObject(Object* source, PDFWalkerName* dest) {
 void PDFWalker::loadArrayObject(Object* source, PDFWalkerArray* dest) {
     for (int i = 0; i < source->arrayGetLength(); ++i) {
         ObjectSharedPtr object = std::make_shared<Object> ();
-        *object = source->arrayGetNF(i);
+        *object = source->arrayGetNF(i).copy();
 
         dest->addItem(object);
     }
 }
 
 void PDFWalker::loadStringObject(Object* source, PDFWalkerString* dest) {
-    QString value(source->getString()->getCString());
+    QString value(source->getString()->toStr().c_str());
     dest->setValue(value);
 }
 
