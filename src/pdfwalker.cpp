@@ -1,5 +1,5 @@
 /*
-Copyright 2016 - 2019 Martin Mancuska <mmancuska@gmail.com.>
+Copyright 2016 - 2020 Martin Mancuska <mmancuska@gmail.com.>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -255,9 +255,11 @@ std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(const ObjectSharedPt
         case objInt64:
             ret.reset(new PDFWalkerNumber<long long>());
             loadNumberObject<long long>(object.get(), dynamic_cast<PDFWalkerNumber<long long>*> (ret.get()));
+            break;
         case objReal:
             ret.reset(new PDFWalkerNumber<double>());
             loadNumberObject<double>(object.get(), dynamic_cast<PDFWalkerNumber<double>*> (ret.get()));
+            break;
         default:
             return nullptr;
         }
