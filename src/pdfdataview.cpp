@@ -27,19 +27,13 @@ PDFDataView::PDFDataView(QWidget *parent) : QWidget(parent)
     mLabel = new QLabel(this);
     mListWidget = new QListWidget(this);
 
-    mLabel->setMaximumSize(DATA_VIEW_WIDTH, mLabel->height());
-    mListWidget->setMaximumSize(DATA_VIEW_WIDTH, DATA_VIEW_HEIGHT);
-    mListWidget->setMinimumSize(DATA_VIEW_WIDTH, DATA_VIEW_HEIGHT);
-
-    QVBoxLayout* layout = new QVBoxLayout;
+    QVBoxLayout* layout = new QVBoxLayout(this);
 
     layout->addWidget(mLabel);
     layout->addWidget(mListWidget);
 
     connect(mListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listWidgetClicked(QListWidgetItem*)));
     connect(mListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listWidgetDoubleClicked(QListWidgetItem*)));
-
-    setLayout(layout);
 }
 
 //slots
