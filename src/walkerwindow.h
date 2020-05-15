@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Mancuska <martin@borg.sk>
+Copyright 2016 - 2020 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -16,6 +16,8 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 #ifndef WALKERWINDOW_H
 #define WALKERWINDOW_H
+
+#include <podofo/podofo.h>
 
 #include <QDialog>
 #include <QString>
@@ -44,10 +46,10 @@ private:
     QHBoxLayout* mLayout;
 
     void addNewViewWindow();
-    void objectToView(PDFWalkerObject* object);
+    void objectToView(const PoDoFo::PdfObject& object);
     void loadTrailer();
-    void loadObject(int number, int gen);
-    void loadObject(ObjectSharedPtr obj);
+    void loadObject(PoDoFo::pdf_objnum number, PoDoFo::pdf_gennum gen);
+    void loadObject(const PoDoFo::PdfObject* object);
 
 public:
     explicit WalkerWindow(std::shared_ptr<PDFWalker> walker, QWidget *parent = 0);

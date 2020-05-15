@@ -16,38 +16,59 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 #include "pdfwalker.h"
 #include "passworddialog.h"
-#include <XRef.h>
-#include <Stream.h>
 #include <utility>
 
 #include <QString>
 
-PDFWalker::PDFWalker(const std::string& fileName) {
-    mFileName = new GooString(fileName.c_str());
+PDFWalker::PDFWalker(const std::string& fileName) : mFileName(fileName) {
+    mPDFDoc = std::make_unique<PoDoFo::PdfMemDocument> ();
+    bool encrypted = false;
 
-    mPDFDoc = std::make_unique<PDFDoc> (mFileName);
-    int i = 0;
-    while (!mPDFDoc->isOk() && i < 3) {
-            PasswordDialog* dlg = new PasswordDialog;
-            if (dlg->exec() == QDialog::Rejected)
-                throw PDFWalkerException("Encrypted PDF. Please, enter password!");
-
-            GooString* password = new GooString(dlg->password().toStdString().c_str());
-
-            //check passwords
-            mPDFDoc.release();
-            mPDFDoc = std::make_unique<PDFDoc> (mFileName, password, password);
-
-            delete password;
-            delete dlg;
-            ++i;
+    try {
+        mPDFDoc->Load(mFileName.c_str());
     }
+    catch (const PoDoFo::PdfError &e) {
+        if (e.GetError() == PoDoFo::ePdfError_InvalidPassword) {
+            encrypted = true;
+        }
+        else
+            throw PDFWalkerException("Cannot open file.");
+    }
+
+    if (encrypted) {
+        for (int i = 0; i < 3; ++i) {
+            std::unique_ptr<PasswordDialog> dlg(new PasswordDialog);
+
+            if (dlg->exec() == QDialog::Rejected)
+                throw PDFWalkerException("Encrypted PDF. Please, enter the password!");
+
+            std::string password = dlg->password().toStdString();
+            mPDFDoc->SetPassword(password);
+
+            try {
+                mPDFDoc->Load(mFileName.c_str());
+                break;
+            }
+            catch (const PoDoFo::PdfError& e) {
+                if (e.GetError() == PoDoFo::ePdfError_InvalidPassword)
+                    continue;
+                else
+                    throw PDFWalkerException("Cannot open file.");
+            }
+        }
+    }
+
+    if (!mPDFDoc->IsLoaded())
+        throw PDFWalkerException("Cannot open file.");
 
     if (!mPDFDoc->isOk())
         throw PDFWalkerException("Cannot open file!");
 
+  //  mTrailerDictionary = mPDFDoc->GetTrailer();/
+   // mTrailerDictionary.reset(mPDFDoc->GetTrailer())
+
     //trailer dict
-    XRef* xref = mPDFDoc->getXRef();
+    /*XRef* xref = mPDFDoc->getXRef();
     Object* trailer = xref->getTrailerDict();
 
     ObjectSharedPtr trailerCopy = std::make_shared<Object> ();
@@ -55,49 +76,39 @@ PDFWalker::PDFWalker(const std::string& fileName) {
 
     auto trailerDict = pdfWalkerObject(trailerCopy);
 
-    mTrailerDictionary.reset(dynamic_cast<PDFWalkerDictionary*> (trailerDict.release()));
+    mTrailerDictionary.reset(dynamic_cast<PDFWalkerDictionary*> (trailerDict.release()));*/
 }
 
 PDFWalker::~PDFWalker() {
-    mPDFDoc.release();
+
 }
 
 //methods
-QString PDFWalker::objTypeString(ObjType type) {
-    switch (type) {
-    case objBool:
+QString PDFWalker::objTypeString(const PoDoFo::PdfObject& object) {
+    if (object.IsBool())
         return "Bool";
-    case objInt:
+    else if (object.IsNumber())
         return "Int";
-    case objReal:
+    else if (object.IsReal())
         return "Real";
-    case objString:
+    else if (object.IsString())
         return "String";
-    case objName:
+    else if (object.IsName())
         return "Name";
-    case objNull:
+    else if (object.IsNull())
         return "Null";
-    case objArray:
+    else if (object.IsArray())
         return "Array";
-    case objDict:
-        return "Dict";
-    case objStream:
+    else if (object.IsDictionary())
+        return "Dictionary";
+    else if (object.IsRawData())
         return "Stream";
-    case objRef:
-        return "Ref";
-    case objCmd:
-        return "Cmd name";
-    case objError:
-        return "Error";
-    case objEOF:
-        return "EOF";
-    case objNone:
-        return "None";
-    case objInt64:
-        return "Int64";
-    default:
+    else if (object.IsHexString())
+        return "HexString";
+    else if (object.IsEmpty())
+        return "Empty";
+    else
         return "";
-    }
 
     return "";
 }

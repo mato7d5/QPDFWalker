@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Mancuska <martin@borg.sk>
+Copyright 2016 - 2020 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -17,15 +17,10 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #ifndef PDFWALKEROBJECT_H
 #define PDFWALKEROBJECT_H
 
-#include <Object.h>
+#include <podofo/base/PdfObject.h>
 
-class PDFWalkerObject
+/*class PDFWalkerObject : public PoDoFo::PdfObject
 {
-protected:
-    ObjType mObjType = objNull;
-    int mNumber = -1;
-    int mGen = -1;
-
 public:
     PDFWalkerObject();
     virtual ~PDFWalkerObject() { }
@@ -42,5 +37,5 @@ public:
     virtual void setGeneration(int gen) { mGen = gen; }
     virtual int generation() const { return mGen; }
 };
-
+*/
 #endif // PDFWALKEROBJECT_H

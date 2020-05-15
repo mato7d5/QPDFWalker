@@ -21,7 +21,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include "global.h"
 #include <QList>
 #include <QString>
-
+/*
 class PDFWalkerArray : public PDFWalkerObject
 {
 private:
@@ -33,5 +33,5 @@ public:
     void addItem(ObjectSharedPtr item) { mItems.push_back(item); }
     const QList<ObjectSharedPtr>& items() const { return mItems; }
 };
-
+*/
 #endif // PDFWALKERARRAY_H

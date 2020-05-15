@@ -1,5 +1,5 @@
 /*
-Copyright 2016 - 2017 Martin Mancuska <mmancuska@gmail.com>
+Copyright 2016 - 2020 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -16,6 +16,8 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 
 #ifndef STREAMDATADIALOG_H
 #define STREAMDATADIALOG_H
+
+#include <podofo/podofo.h>
 
 #include "global.h"
 #include <QDialog>
@@ -36,7 +38,7 @@ private:
     enum class DisplayEncoding { Latin1 = 0, Unicode = 1, PDFDocEncoding = 2, Ascii = 3 };
 
 public:
-    explicit StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *parent = 0);
+    explicit StreamDataDialog(const PoDoFo::PdfObject& streamObj, QWidget *parent = 0);
     ~StreamDataDialog();
 
 private slots:

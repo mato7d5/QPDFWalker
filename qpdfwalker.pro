@@ -11,16 +11,20 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = qpdfwalker
 TEMPLATE = app
 
-CONFIG += c++14
-QMAKE_CXXFLAGS += -std=c++14
+CONFIG += c++17
+QMAKE_CXXFLAGS += -std=c++17
 
 unix:!macx {
     INCLUDEPATH += /usr/include/poppler
 }
 macx: {
     # assume that poppler was installed by brew and located on this path
-    INCLUDEPATH += /usr/local/opt/poppler/include/poppler
-    LIBS += -L/usr/local/opt/poppler/lib
+    #INCLUDEPATH += /usr/local/opt/poppler/include/poppler
+    #LIBS += -L/usr/local/opt/poppler/lib
+
+    # assume that podofo was installed by brew and located on this path
+    INCLUDEPATH += /usr/local/opt/podofo/include
+    LIBS += -L/usr/local/opt/podofo/lib
 }
 
 SOURCES += src/main.cpp\
@@ -28,13 +32,13 @@ SOURCES += src/main.cpp\
     src/walkerwindow.cpp \
     src/pdfwalker.cpp \
     src/pdfdataview.cpp \
-    src/pdfwalkerobject.cpp \
-    src/pdfwalkerdictionary.cpp \
-    src/pdfwalkername.cpp \
-    src/pdfwalkerarray.cpp \
-    src/pdfwalkerstring.cpp \
-    src/pdfwalkerboolean.cpp \
-    src/pdfwalkerstream.cpp \
+   # src/pdfwalkerobject.cpp \
+  #  src/pdfwalkerdictionary.cpp \
+  #  src/pdfwalkername.cpp \
+  #  src/pdfwalkerarray.cpp \
+  #  src/pdfwalkerstring.cpp \
+  #  src/pdfwalkerboolean.cpp \
+  #  src/pdfwalkerstream.cpp \
     src/streamdatadialog.cpp \
     src/scrollareaviewport.cpp \
     src/aboutdialog.cpp \
@@ -45,14 +49,14 @@ HEADERS  += src/maindialog.h \
     src/pdfwalker.h \
     src/pdfdataview.h \
     src/global.h \
-    src/pdfwalkerobject.h \
-    src/pdfwalkerdictionary.h \
-    src/pdfwalkername.h \
-    src/pdfwalkerarray.h \
-    src/pdfwalkerstring.h \
-    src/pdfwalkernumber.h \
-    src/pdfwalkerboolean.h \
-    src/pdfwalkerstream.h \
+  #  src/pdfwalkerobject.h \
+  #  src/pdfwalkerdictionary.h \
+  #  src/pdfwalkername.h \
+  #  src/pdfwalkerarray.h \
+  #  src/pdfwalkerstring.h \
+  #  src/pdfwalkernumber.h \
+  #  src/pdfwalkerboolean.h \
+  #  src/pdfwalkerstream.h \
     src/streamdatadialog.h \
     src/scrollareaviewport.h \
     src/aboutdialog.h \
@@ -65,7 +69,7 @@ FORMS    += src/maindialog.ui \
     src/aboutdialog.ui \
     src/passworddialog.ui
 
-LIBS += -lpoppler
+LIBS += -lpodofo
 
 RESOURCES += \
     src/resources.qrc

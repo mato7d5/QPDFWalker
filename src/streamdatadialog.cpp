@@ -1,5 +1,5 @@
 /*
-Copyright 2016 - 2019 Martin Mancuska <mmancuska@gmail.com>
+Copyright 2016 - 2020 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -26,7 +26,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <QScrollArea>
 #include <QPixmap>
 
-StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *parent) :
+StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, QWidget *parent) :
     QDialog(parent),
     mStreamImage(false),
     ui(new Ui::StreamDataDialog)
@@ -44,15 +44,12 @@ StreamDataDialog::StreamDataDialog(const ObjectSharedPtr& streamObj, QWidget *pa
     ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::PDFDocEncoding), tr("PDFDocEncoding"));
     ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::Ascii), tr("Ascii"));
 
-    Stream* stream = streamObj->getStream();
-    Dict* streamDict = stream->getDict();
-    ObjectUniquePtr subtype = std::make_unique<Object> ();
-    *subtype = streamDict->lookup("Subtype");
+    const auto* stream = streamObj.GetStream();
+    const auto& dict = streamObj.GetDictionary();
 
-    if (subtype->isName())
-    {
-        std::string name = subtype->getName();
-        if (name == "Image")
+    if (dict.HasKey("Subtype")) {
+        auto subtype = dict.GetKeyAsName("Subtype");
+        if (subtype.GetName() == "Image")
             mStreamImage = true;
     }
 

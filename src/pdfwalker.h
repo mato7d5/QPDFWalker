@@ -1,5 +1,5 @@
 /*
-Copyright 2016 - 2017 Martin Mancuska <martin@borg.sk>
+Copyright 2016 - 2020 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -17,7 +17,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #ifndef PDFWALKER_H
 #define PDFWALKER_H
 
-#include <PDFDoc.h>
+#include <podofo/podofo.h>
 
 #include <string>
 #include <memory>
@@ -40,9 +40,9 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 class PDFWalker final
 {
 private:
-    GooString* mFileName;
-    std::unique_ptr<PDFDoc> mPDFDoc;
-    std::shared_ptr<PDFWalkerDictionary> mTrailerDictionary;
+    std::string mFileName;
+    std::unique_ptr<PoDoFo::PdfMemDocument> mPDFDoc;
+    PoDoFo::PdfDictionary* mTrailerDictionary;
 
     static void loadDictionaryObject(Object* source, PDFWalkerDictionary* dest);
     static void loadNameObject(Object* source, PDFWalkerName* dest);
@@ -58,14 +58,17 @@ public:
     PDFWalker(const std::string& fileName);
     ~PDFWalker();
 
-    const char* fileName() const { return mFileName->toStr().c_str(); }
+    const char* fileName() const { return mFileName.c_str(); }
 
-    std::shared_ptr<PDFWalkerDictionary> trailerDictionary() { return mTrailerDictionary; }
+  /*  std::shared_ptr<PDFWalkerDictionary> trailerDictionary() { return mTrailerDictionary; }
 
     std::unique_ptr<PDFWalkerObject> pdfWalkerObject(int number, int gen);
     std::unique_ptr<PDFWalkerObject> pdfWalkerObject(const ObjectSharedPtr& object);
+*/
+    static QString objTypeString(const PoDoFo::PdfObject& object);
 
-    static QString objTypeString(ObjType type);
+    // PODOFO
+    const PoDoFo::PdfDictionary& getTrailer() { return mPDFDoc->GetTrailer()->GetDictionary(); }
 };
 
 template<typename T>
