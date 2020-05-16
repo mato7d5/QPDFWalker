@@ -26,7 +26,6 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <memory>
 #include "pdfwalker.h"
 #include "pdfdataview.h"
-#include "pdfwalkerobject.h"
 #include "scrollareaviewport.h"
 #include "global.h"
 
@@ -46,7 +45,7 @@ private:
     QHBoxLayout* mLayout;
 
     void addNewViewWindow();
-    void objectToView(const PoDoFo::PdfObject& object);
+    void objectToView(const PoDoFo::PdfObject& in_object);
     void loadTrailer();
     void loadObject(PoDoFo::pdf_objnum number, PoDoFo::pdf_gennum gen);
     void loadObject(const PoDoFo::PdfObject* object);

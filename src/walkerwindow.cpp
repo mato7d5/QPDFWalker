@@ -70,14 +70,14 @@ void WalkerWindow::pdfObjectClickedSlot(const ViewItemData& data) {
         }
         else {
             mNextViewWindowIndex = data.currentViewIndex + 1;
-            loadObject(data.object);
+            loadObject(data.object.get());
         }
     }
 }
 
 void WalkerWindow::pdfObjectDoubleClickedSlot(const ViewItemData& data) {
     if (data.object->HasStream()) {
-        StreamDataDialog dlg(data.object, this);
+        StreamDataDialog dlg(*data.object, this);
         dlg.exec();
     }
 }
@@ -95,7 +95,7 @@ void WalkerWindow::addNewViewWindow() {
     mDataViews.push_back(view);
 }
 
-void WalkerWindow::objectToView(const PoDoFo::PdfObject& object) {
+void WalkerWindow::objectToView(const PoDoFo::PdfObject& in_object) {
     bool viewPortResized = false;
 
     if (mNextViewWindowIndex == mViewWindowCount) {
@@ -106,20 +106,25 @@ void WalkerWindow::objectToView(const PoDoFo::PdfObject& object) {
     for (int i = mNextViewWindowIndex; i < mDataViews.size(); ++i)
         mDataViews[i]->clearView();
 
+    const PoDoFo::PdfObject* referenced_object = nullptr;
     QString title;
-    if (object.IsReference()) {
-        const PoDoFo::PdfReference& reference = object.GetReference();
-        title.append(QString::fromUtf8("%1 [%2 %3]").arg(PDFWalker::objTypeString(object).arg(reference.ObjectNumber()).arg(reference.GenerationNumber())));
+    if (in_object.IsReference()) {
+        const PoDoFo::PdfReference& reference = in_object.GetReference();
+        title.append(QString::fromUtf8("%1 [%2 %3]").arg(PDFWalker::objTypeString(in_object)).arg(reference.ObjectNumber()).arg(reference.GenerationNumber()));
+        referenced_object = mWalker->getReferencedObject(reference);
     }
     else
-        title.append(QString::fromUtf8("%1").arg(PDFWalker::objTypeString(object)));
+        title.append(QString::fromUtf8("%1").arg(PDFWalker::objTypeString(in_object)));
 
-    if (object.IsDictionary()) {
+    const PoDoFo::PdfObject& object = referenced_object ? *referenced_object : in_object;
+
+    if (object.IsDictionary() && !object.HasStream()) {
         const PoDoFo::PdfDictionary& dict = object.GetDictionary();
 
         for (const auto& key : dict.GetKeys()) {
             QListWidgetItem* i = new QListWidgetItem(key.first.GetName().c_str());
-            ViewItemData itemData { key.second, mNextViewWindowIndex };
+            std::shared_ptr<PoDoFo::PdfObject> copy_obj(new PoDoFo::PdfObject(*key.second));
+            ViewItemData itemData { copy_obj, mNextViewWindowIndex };
             mDataViews[mNextViewWindowIndex]->addItem(i, itemData);
         }
     }
@@ -133,12 +138,12 @@ void WalkerWindow::objectToView(const PoDoFo::PdfObject& object) {
         const PoDoFo::PdfArray& array = object.GetArray();
 
         int idx = 0;
-        for (const auto& i : array) {
-            QString str = QString("[%1]").arg(idx);
+        for (const auto& array_item : array) {
+            QString str = QString("[%1]").arg(idx++);
             QListWidgetItem* widgetItem = new QListWidgetItem(str);
-            PoDoFo::PdfObject* item = new PoDoFo::PdfObject(i);
+            std::shared_ptr<PoDoFo::PdfObject> copy_obj (new PoDoFo::PdfObject(array_item));
 
-            ViewItemData itemData { item, mNextViewWindowIndex };
+            ViewItemData itemData { copy_obj, mNextViewWindowIndex };
             mDataViews[mNextViewWindowIndex]->addItem(widgetItem, itemData);
         }
 
@@ -179,14 +184,15 @@ void WalkerWindow::objectToView(const PoDoFo::PdfObject& object) {
     }
     else if (object.HasStream()) {
         QListWidgetItem* dataWI = new QListWidgetItem("[Data]");
-        PoDoFo::PdfObject* copy_obj = new PoDoFo::PdfObject(object);
+        std::shared_ptr<PoDoFo::PdfObject> copy_obj(new PoDoFo::PdfObject(object));
         ViewItemData dataWID { copy_obj, mNextViewWindowIndex };
         mDataViews[mNextViewWindowIndex]->addItem(dataWI, dataWID);
 
         const PoDoFo::PdfDictionary& dict = object.GetDictionary();
         for (const auto& key : dict.GetKeys()) {
             QListWidgetItem* i = new QListWidgetItem(key.first.GetName().c_str());
-            ViewItemData itemData { key.second, mNextViewWindowIndex };
+            std::shared_ptr<PoDoFo::PdfObject> copy_obj(new PoDoFo::PdfObject(*key.second));
+            ViewItemData itemData { copy_obj, mNextViewWindowIndex };
             mDataViews[mNextViewWindowIndex]->addItem(i, itemData);
         }
 
@@ -210,7 +216,7 @@ void WalkerWindow::loadTrailer() {
     }
 
     auto trailerDict = mWalker->getTrailer();
-    objectToView(trailerDict.get());
+    objectToView(trailerDict);
 }
 
 void WalkerWindow::loadObject(PoDoFo::pdf_objnum number, PoDoFo::pdf_gennum gen) {

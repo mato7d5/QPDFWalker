@@ -11,8 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = qpdfwalker
 TEMPLATE = app
 
-CONFIG += c++17
-QMAKE_CXXFLAGS += -std=c++17
+CONFIG += c++14
+QMAKE_CXXFLAGS += -std=c++14
 
 unix:!macx {
     INCLUDEPATH += /usr/include/poppler

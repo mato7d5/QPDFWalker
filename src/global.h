@@ -21,7 +21,7 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <memory>
 
 struct ViewItemData {
-    PoDoFo::PdfObject* object { nullptr };
+    std::shared_ptr<PoDoFo::PdfObject> object { nullptr };
     int currentViewIndex { -1 } ;
 };
 

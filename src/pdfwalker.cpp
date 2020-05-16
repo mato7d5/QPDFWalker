@@ -60,23 +60,6 @@ PDFWalker::PDFWalker(const std::string& fileName) : mFileName(fileName) {
 
     if (!mPDFDoc->IsLoaded())
         throw PDFWalkerException("Cannot open file.");
-
-    if (!mPDFDoc->isOk())
-        throw PDFWalkerException("Cannot open file!");
-
-  //  mTrailerDictionary = mPDFDoc->GetTrailer();/
-   // mTrailerDictionary.reset(mPDFDoc->GetTrailer())
-
-    //trailer dict
-    /*XRef* xref = mPDFDoc->getXRef();
-    Object* trailer = xref->getTrailerDict();
-
-    ObjectSharedPtr trailerCopy = std::make_shared<Object> ();
-    *trailerCopy = trailer->copy();
-
-    auto trailerDict = pdfWalkerObject(trailerCopy);
-
-    mTrailerDictionary.reset(dynamic_cast<PDFWalkerDictionary*> (trailerDict.release()));*/
 }
 
 PDFWalker::~PDFWalker() {
@@ -84,6 +67,10 @@ PDFWalker::~PDFWalker() {
 }
 
 //methods
+const PoDoFo::PdfObject* PDFWalker::getReferencedObject(const PoDoFo::PdfReference &reference) {
+    return mPDFDoc->GetObjects().GetObject(reference);
+}
+
 QString PDFWalker::objTypeString(const PoDoFo::PdfObject& object) {
     if (object.IsBool())
         return "Bool";
@@ -111,184 +98,4 @@ QString PDFWalker::objTypeString(const PoDoFo::PdfObject& object) {
         return "";
 
     return "";
-}
-
-void PDFWalker::loadDictionaryObject(Object* source, PDFWalkerDictionary* dest) {
-    for (int i = 0; i < source->dictGetLength(); ++i) {
-        PDFWalkerDictionary::DictionaryData data;
-        data.key = source->dictGetKey(i);
-        ObjectSharedPtr value = std::make_shared<Object> ();
-        const Object& ret_obj = source->dictGetValNF(i);
-        *value = ret_obj.copy();
-        data.value = value;
-
-        dest->addItem(data);
-    }
-}
-
-void PDFWalker::loadNameObject(Object* source, PDFWalkerName* dest) {
-    QString value = source->getName();
-    dest->setValue(value);
-}
-
-void PDFWalker::loadArrayObject(Object* source, PDFWalkerArray* dest) {
-    for (int i = 0; i < source->arrayGetLength(); ++i) {
-        ObjectSharedPtr object = std::make_shared<Object> ();
-        *object = source->arrayGetNF(i).copy();
-
-        dest->addItem(object);
-    }
-}
-
-void PDFWalker::loadStringObject(Object* source, PDFWalkerString* dest) {
-    QString value(source->getString()->toStr().c_str());
-    dest->setValue(value);
-}
-
-void PDFWalker::loadBooleanObject(Object* source, PDFWalkerBoolean* dest) {
-    dest->setValue(source->getBool() ? "True" : "False");
-}
-
-void PDFWalker::loadStreamObject(Object* source, PDFWalkerStream* dest) {
-    Object* sourceCopy = new Object;
-    *sourceCopy = source->copy();
-    dest->setValue(sourceCopy);
-}
-
-std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(int number, int gen) {
-    std::unique_ptr<PDFWalkerObject> ret(nullptr);
-
-    XRef* xref = mPDFDoc->getXRef();
-    Object obj;
-    obj.setToNull();
-
-    obj = xref->fetch(number, gen);
-    if (!obj.isNull()) {
-        if (obj.isDict()) {
-            ret.reset(new PDFWalkerDictionary());
-            loadDictionaryObject(&obj, dynamic_cast<PDFWalkerDictionary*> (ret.get()));
-            ret->setNumber(number);
-            ret->setGeneration(gen);
-        }
-
-        if (obj.isName()) {
-            ret.reset(new PDFWalkerName());
-            loadNameObject(&obj, dynamic_cast<PDFWalkerName*> (ret.get()));
-            ret->setNumber(number);
-            ret->setGeneration(gen);
-        }
-
-        if (obj.isArray()) {
-            ret.reset(new PDFWalkerArray());
-            loadArrayObject(&obj, dynamic_cast<PDFWalkerArray*> (ret.get()));
-            ret->setNumber(number);
-            ret->setGeneration(gen);
-        }
-
-        if (obj.isString()) {
-            ret.reset(new PDFWalkerString());
-            loadStringObject(&obj, dynamic_cast<PDFWalkerString*> (ret.get()));
-            ret->setNumber(number);
-            ret->setGeneration(gen);
-        }
-
-        if (obj.isInt() || obj.isInt64() || obj.isReal()) {
-            switch (obj.getType()) {
-            case objInt:
-                ret.reset(new PDFWalkerNumber<int>());
-                loadNumberObject<int>(&obj, dynamic_cast<PDFWalkerNumber<int>*> (ret.get()));
-                break;
-            case objInt64:
-                ret.reset(new PDFWalkerNumber<long long>());
-                loadNumberObject<long long>(&obj, dynamic_cast<PDFWalkerNumber<long long>*> (ret.get()));
-            case objReal:
-                ret.reset(new PDFWalkerNumber<double>());
-                loadNumberObject<double>(&obj, dynamic_cast<PDFWalkerNumber<double>*> (ret.get()));
-            default:
-                return nullptr;
-            }
-
-            ret->setNumber(number);
-            ret->setGeneration(gen);
-        }
-
-        if (obj.isBool()) {
-            ret.reset(new PDFWalkerBoolean());
-            loadBooleanObject(&obj, dynamic_cast<PDFWalkerBoolean*> (ret.get()));
-            ret->setNumber(number);
-            ret->setGeneration(gen);
-        }
-
-        if (obj.isStream()) {
-            ret.reset(new PDFWalkerStream());
-            loadStreamObject(&obj, dynamic_cast<PDFWalkerStream*> (ret.get()));
-            ret->setNumber(number);
-            ret->setGeneration(gen);
-        }
-    }
-
-    return ret;
-}
-
-std::unique_ptr<PDFWalkerObject> PDFWalker::pdfWalkerObject(const ObjectSharedPtr& object) {
-    std::unique_ptr<PDFWalkerObject> ret(nullptr);
-
-    if (object->isDict()) {
-        ret.reset(new PDFWalkerDictionary());
-        loadDictionaryObject(object.get(), dynamic_cast<PDFWalkerDictionary*> (ret.get()));
-        ret->setDirect();
-    }
-
-    if (object->isName()) {
-        ret.reset(new PDFWalkerName());
-        loadNameObject(object.get(), dynamic_cast<PDFWalkerName*> (ret.get()));
-        ret->setDirect();
-    }
-
-    if (object->isArray()) {
-        ret.reset(new PDFWalkerArray());
-        loadArrayObject(object.get(), dynamic_cast<PDFWalkerArray*> (ret.get()));
-        ret->setDirect();
-    }
-
-    if (object->isString()) {
-        ret.reset(new PDFWalkerString());
-        loadStringObject(object.get(), dynamic_cast<PDFWalkerString*> (ret.get()));
-        ret->setDirect();
-    }
-
-    if (object->isInt() || object->isInt64() || object->isReal()) {
-        switch (object->getType()) {
-        case objInt:
-            ret.reset(new PDFWalkerNumber<int>());
-            loadNumberObject<int>(object.get(), dynamic_cast<PDFWalkerNumber<int>*> (ret.get()));
-            break;
-        case objInt64:
-            ret.reset(new PDFWalkerNumber<long long>());
-            loadNumberObject<long long>(object.get(), dynamic_cast<PDFWalkerNumber<long long>*> (ret.get()));
-            break;
-        case objReal:
-            ret.reset(new PDFWalkerNumber<double>());
-            loadNumberObject<double>(object.get(), dynamic_cast<PDFWalkerNumber<double>*> (ret.get()));
-            break;
-        default:
-            return nullptr;
-        }
-
-        ret->setDirect();
-    }
-
-    if (object->isBool()) {
-        ret.reset(new PDFWalkerBoolean());
-        loadBooleanObject(object.get(), dynamic_cast<PDFWalkerBoolean*> (ret.get()));
-        ret->setDirect();
-    }
-
-    if (object->isStream()) {
-        ret.reset(new PDFWalkerStream());
-        loadStreamObject(object.get(), dynamic_cast<PDFWalkerStream*> (ret.get()));
-        ret->setDirect();
-    }
-
-    return ret;
 }

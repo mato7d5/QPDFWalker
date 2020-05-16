@@ -56,7 +56,7 @@ StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, QWidget *
     bool imageLoaded = false;
 
     if (mStreamImage) {
-        QPixmap image;
+       /* QPixmap image;
         StreamKind kind = stream->getKind();
 
         if (kind == StreamKind::strDCT) {
@@ -169,27 +169,30 @@ StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, QWidget *
             }
 
             delete[] buf;
-        }
+        }*/
     }
 
     if (!imageLoaded) {
-        // load the stream data
-        int c;
+        PoDoFo::PdfMemoryOutputStream output;
+        stream->GetFilteredCopy(&output);
 
-        streamObj->streamReset();
-        while ((c = streamObj->streamGetChar()) != EOF)
-            mStreamData.append(static_cast<char> (c));
+        if (output.GetLength() > 0) {
+            char* data = output.TakeBuffer();
+            mStreamData.append(data);
 
-        streamObj->streamClose();
+            if (data) {
+                ui->uiStreamData->insertPlainText(mStreamData.data());
+                ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
+                ui->uiDisplayEncodingCombo->setCurrentIndex(static_cast<int> (DisplayEncoding::Latin1));
 
-        ui->uiStreamData->insertPlainText(mStreamData.data());
-        ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
-        ui->uiDisplayEncodingCombo->setCurrentIndex(static_cast<int> (DisplayEncoding::Latin1));
+                ui->uiDecodedLength->setText(QString("%1").arg(stream->GetLength()));
 
-        ui->uiDecodedLength->setText(QString("%1").arg(mStreamData.length()));
+                free(data);
+            }
+        }
+
+        ui->uiEncodedLength->setText(QString("%1").arg(dict.GetKey("Length")->GetNumber()));
     }
-
-    ui->uiEncodedLength->setText(QString("%1").arg(stream->getBaseStream()->getLength()));
 }
 
 StreamDataDialog::~StreamDataDialog()

@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Mancuska <martin@borg.sk>
+Copyright 2016 - 2020 Martin Mancuska <mmancuska@gmail.com>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 3,
 as published bythe Free Software Foundation.
@@ -27,13 +27,19 @@ PDFDataView::PDFDataView(QWidget *parent) : QWidget(parent)
     mLabel = new QLabel(this);
     mListWidget = new QListWidget(this);
 
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    mLabel->setMaximumSize(DATA_VIEW_WIDTH, mLabel->height());
+    mListWidget->setMaximumSize(DATA_VIEW_WIDTH, DATA_VIEW_HEIGHT);
+    mListWidget->setMinimumSize(DATA_VIEW_WIDTH, DATA_VIEW_HEIGHT);
+
+    QVBoxLayout* layout = new QVBoxLayout;
 
     layout->addWidget(mLabel);
     layout->addWidget(mListWidget);
 
     connect(mListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listWidgetClicked(QListWidgetItem*)));
     connect(mListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listWidgetDoubleClicked(QListWidgetItem*)));
+
+    setLayout(layout);
 }
 
 //slots
