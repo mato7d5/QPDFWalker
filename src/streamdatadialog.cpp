@@ -26,8 +26,9 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <QScrollArea>
 #include <QPixmap>
 
-StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, QWidget *parent) :
+StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, const std::shared_ptr<QByteArray>& stream_data, QWidget *parent) :
     QDialog(parent),
+    mStreamData(stream_data),
     mStreamImage(false),
     ui(new Ui::StreamDataDialog)
 {
@@ -44,7 +45,6 @@ StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, QWidget *
     ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::PDFDocEncoding), tr("PDFDocEncoding"));
     ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::Ascii), tr("Ascii"));
 
-    const auto* stream = streamObj.GetStream();
     const auto& dict = streamObj.GetDictionary();
 
     if (dict.HasKey("Subtype")) {
@@ -56,139 +56,43 @@ StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, QWidget *
     bool imageLoaded = false;
 
     if (mStreamImage) {
-       /* QPixmap image;
-        StreamKind kind = stream->getKind();
+        QPixmap image;
 
-        if (kind == StreamKind::strDCT) {
-            Stream* nextStream = stream->getNextStream();
+        imageLoaded = image.loadFromData(*mStreamData);
 
-            if (nextStream) {
-                auto size = nextStream->getBaseStream()->getLength();
-                uchar* buf = new uchar[size];
-                nextStream->reset();
-                nextStream->doGetChars(size, buf);
+        if (imageLoaded) {
+            ui->uiStreamData->setEnabled(false);
+            ui->uiDisplayEncodingCombo->setEnabled(false);
+            ui->uiDisplayModeCombo->setEnabled(false);
+            ui->uiDecodedLength->setText("N/A");
+            ui->uiClipboardBtn->setEnabled(false);
+            ui->uiSaveToFileBtn->setEnabled(false);
 
-                imageLoaded = image.loadFromData(buf, size);
+            QLabel* imageViewer = new QLabel(this);
+            QScrollArea* scrollArea = new QScrollArea;
 
-                if (imageLoaded) {
-                    ui->uiStreamData->setEnabled(false);
-                    ui->uiDisplayEncodingCombo->setEnabled(false);
-                    ui->uiDisplayModeCombo->setEnabled(false);
-                    ui->uiDecodedLength->setText("N/A");
-                    ui->uiClipboardBtn->setEnabled(false);
-                    ui->uiSaveToFileBtn->setEnabled(false);
+            imageViewer->setBackgroundRole(QPalette::Base);
+            imageViewer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+            imageViewer->setScaledContents(true);
 
-                    QLabel* imageViewer = new QLabel(this);
-                    QScrollArea* scrollArea = new QScrollArea;
+            scrollArea->setBackgroundRole(QPalette::Dark);
+            scrollArea->setWidget(imageViewer);
 
-                    imageViewer->setBackgroundRole(QPalette::Base);
-                    imageViewer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-                    imageViewer->setScaledContents(true);
+            imageViewer->setPixmap(image);
+            imageViewer->adjustSize();
 
-                    scrollArea->setBackgroundRole(QPalette::Dark);
-                    scrollArea->setWidget(imageViewer);
-
-                    imageViewer->setPixmap(image);
-                    imageViewer->adjustSize();
-
-                    ui->verticalLayout_2->replaceWidget(ui->uiStreamData, scrollArea);
-                    ui->uiStreamData->setVisible(false);
-                }
-
-                delete[] buf;
-            }
+            ui->verticalLayout_2->replaceWidget(ui->uiStreamData, scrollArea);
+            ui->uiStreamData->setVisible(false);
         }
-        else if (kind == StreamKind::strJPX) {
-            Stream* nextStream = stream->getNextStream();
-            auto size = nextStream->getBaseStream()->getLength();
-            uchar* buf = new uchar[size];
-            nextStream->reset();
-            nextStream->doGetChars(size, buf);
-
-            imageLoaded = image.loadFromData(buf, size);
-
-            if (imageLoaded) {
-                ui->uiStreamData->setEnabled(false);
-                ui->uiDisplayEncodingCombo->setEnabled(false);
-                ui->uiDisplayModeCombo->setEnabled(false);
-                ui->uiDecodedLength->setText("N/A");
-                ui->uiClipboardBtn->setEnabled(false);
-                ui->uiSaveToFileBtn->setEnabled(false);
-
-                QLabel* imageViewer = new QLabel(this);
-                QScrollArea* scrollArea = new QScrollArea;
-
-                imageViewer->setBackgroundRole(QPalette::Base);
-                imageViewer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-                imageViewer->setScaledContents(true);
-
-                scrollArea->setBackgroundRole(QPalette::Dark);
-                scrollArea->setWidget(imageViewer);
-
-                imageViewer->setPixmap(image);
-                imageViewer->adjustSize();
-
-                ui->verticalLayout_2->replaceWidget(ui->uiStreamData, scrollArea);
-                ui->uiStreamData->setVisible(false);
-            }
-
-            delete[] buf;
-        }
-        else if (kind == StreamKind::strJBIG2) {
-            Stream* nextStream = stream->getNextStream();
-            auto size = nextStream->getBaseStream()->getLength();
-            uchar* buf = new uchar[size];
-            nextStream->reset();
-            nextStream->doGetChars(size, buf);
-
-            imageLoaded = image.loadFromData(buf, size);
-
-            if (imageLoaded) {
-                ui->uiStreamData->setEnabled(false);
-                ui->uiDisplayEncodingCombo->setEnabled(false);
-                ui->uiDisplayModeCombo->setEnabled(false);
-                ui->uiDecodedLength->setText("N/A");
-                ui->uiClipboardBtn->setEnabled(false);
-                ui->uiSaveToFileBtn->setEnabled(false);
-
-                QLabel* imageViewer = new QLabel(this);
-                QScrollArea* scrollArea = new QScrollArea;
-
-                imageViewer->setBackgroundRole(QPalette::Base);
-                imageViewer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-                imageViewer->setScaledContents(true);
-
-                scrollArea->setBackgroundRole(QPalette::Dark);
-                scrollArea->setWidget(imageViewer);
-
-                imageViewer->setPixmap(image);
-                imageViewer->adjustSize();
-
-                ui->verticalLayout_2->replaceWidget(ui->uiStreamData, scrollArea);
-                ui->uiStreamData->setVisible(false);
-            }
-
-            delete[] buf;
-        }*/
     }
 
     if (!imageLoaded) {
-        PoDoFo::PdfMemoryOutputStream output;
-        stream->GetFilteredCopy(&output);
+        if (mStreamData && !mStreamData->isEmpty()) {
+            ui->uiStreamData->insertPlainText(mStreamData->data());
+            ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
+            ui->uiDisplayEncodingCombo->setCurrentIndex(static_cast<int> (DisplayEncoding::Latin1));
 
-        if (output.GetLength() > 0) {
-            char* data = output.TakeBuffer();
-            mStreamData.append(data);
-
-            if (data) {
-                ui->uiStreamData->insertPlainText(mStreamData.data());
-                ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
-                ui->uiDisplayEncodingCombo->setCurrentIndex(static_cast<int> (DisplayEncoding::Latin1));
-
-                ui->uiDecodedLength->setText(QString("%1").arg(stream->GetLength()));
-
-                free(data);
-            }
+            ui->uiDecodedLength->setText(QString("%1").arg(mStreamData->size()));
         }
 
         ui->uiEncodedLength->setText(QString("%1").arg(dict.GetKey("Length")->GetNumber()));
@@ -233,16 +137,16 @@ void StreamDataDialog::on_uiDisplayModeCombo_currentIndexChanged(int index)
     switch (mode) {
     case DisplayMode::Text:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(mStreamData.data());
+        ui->uiStreamData->insertPlainText(mStreamData->data());
         break;
 
     case DisplayMode::Base64:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(mStreamData.toBase64());
+        ui->uiStreamData->insertPlainText(mStreamData->toBase64());
         break;
     case DisplayMode::Hex:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(mStreamData.toHex());
+        ui->uiStreamData->insertPlainText(mStreamData->toHex());
         break;
     default:
         break;
@@ -257,15 +161,15 @@ void StreamDataDialog::on_uiDisplayEncodingCombo_currentIndexChanged(int index)
     case DisplayEncoding::Latin1:
     case DisplayEncoding::PDFDocEncoding:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(QString::fromLatin1(mStreamData.data()));
+        ui->uiStreamData->insertPlainText(QString::fromLatin1(mStreamData->data()));
         break;
     case DisplayEncoding::Unicode:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(QString::fromUtf16(reinterpret_cast<ushort*> (mStreamData.data())));
+        ui->uiStreamData->insertPlainText(QString::fromUtf16(reinterpret_cast<ushort*> (mStreamData->data())));
         break;
     case DisplayEncoding::Ascii:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(QString::fromStdString(mStreamData.data()));
+        ui->uiStreamData->insertPlainText(QString::fromStdString(mStreamData->data()));
         break;
     default:
         break;

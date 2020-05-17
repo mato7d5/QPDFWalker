@@ -18,10 +18,12 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #define GLOBAL_H
 
 #include "podofo/base/PdfObject.h"
+#include <QByteArray>
 #include <memory>
 
 struct ViewItemData {
     std::shared_ptr<PoDoFo::PdfObject> object { nullptr };
+    std::shared_ptr<QByteArray> stream_data { nullptr };
     int currentViewIndex { -1 } ;
 };
 

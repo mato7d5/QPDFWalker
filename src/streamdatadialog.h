@@ -20,8 +20,11 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <podofo/podofo.h>
 
 #include "global.h"
+
 #include <QDialog>
 #include <QByteArray>
+
+#include <memory>
 
 namespace Ui {
 class StreamDataDialog;
@@ -31,14 +34,14 @@ class StreamDataDialog : public QDialog
 {
     Q_OBJECT
 private:
-    QByteArray mStreamData;
+    std::shared_ptr<QByteArray> mStreamData { nullptr };
     bool mStreamImage;
 
     enum class DisplayMode { Text = 0, Base64 = 1, Hex = 2 };
     enum class DisplayEncoding { Latin1 = 0, Unicode = 1, PDFDocEncoding = 2, Ascii = 3 };
 
 public:
-    explicit StreamDataDialog(const PoDoFo::PdfObject& streamObj, QWidget *parent = 0);
+    explicit StreamDataDialog(const PoDoFo::PdfObject& streamObj, const std::shared_ptr<QByteArray>& stream_data, QWidget *parent = 0);
     ~StreamDataDialog();
 
 private slots:
