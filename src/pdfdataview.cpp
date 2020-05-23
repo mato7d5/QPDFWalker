@@ -46,7 +46,7 @@ PDFDataView::PDFDataView(QWidget *parent) : QWidget(parent)
 void PDFDataView::listWidgetClicked(QListWidgetItem* item) {
     auto itemData = mItems.find(item);
 
-    if (itemData != mItems.end() && itemData->second.object != nullptr) {
+    if (itemData != mItems.end() && itemData->second.GetObject() != nullptr) {
         emit pdfObjectClicked(itemData->second);
     }
 }
@@ -54,14 +54,14 @@ void PDFDataView::listWidgetClicked(QListWidgetItem* item) {
 void PDFDataView::listWidgetDoubleClicked(QListWidgetItem* item) {
     auto itemData = mItems.find(item);
 
-    if (itemData != mItems.end() && itemData->second.object != nullptr) {
+    if (itemData != mItems.end() && itemData->second.GetObject() != nullptr) {
         emit pdfObjectDoubleClicked(itemData->second);
     }
 }
 
 //methods
 void PDFDataView::addItem(QListWidgetItem* item, ViewItemData data) {
-    mItems.insert(std::make_pair(item, data));
+    mItems.insert(std::make_pair(item, std::move(data)));
     mListWidget->addItem(item);
 }
 

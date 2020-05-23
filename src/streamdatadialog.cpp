@@ -26,9 +26,9 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #include <QScrollArea>
 #include <QPixmap>
 
-StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, const std::shared_ptr<QByteArray>& stream_data, QWidget *parent) :
+StreamDataDialog::StreamDataDialog(const ViewItemData& data, QWidget* parent) :
     QDialog(parent),
-    mStreamData(stream_data),
+    item_data { data },
     mStreamImage(false),
     ui(new Ui::StreamDataDialog)
 {
@@ -45,7 +45,7 @@ StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, const std
     ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::PDFDocEncoding), tr("PDFDocEncoding"));
     ui->uiDisplayEncodingCombo->insertItem(static_cast<int> (DisplayEncoding::Ascii), tr("Ascii"));
 
-    const auto& dict = streamObj.GetDictionary();
+    const auto& dict = data.GetObject()->GetDictionary();
 
     if (dict.HasKey("Subtype")) {
         auto subtype = dict.GetKeyAsName("Subtype");
@@ -58,7 +58,7 @@ StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, const std
     if (mStreamImage) {
         QPixmap image;
 
-        imageLoaded = image.loadFromData(*mStreamData);
+        imageLoaded = image.loadFromData((const uchar *) data.GetStreamData(), data.GetStreamLength());
 
         if (imageLoaded) {
             ui->uiStreamData->setEnabled(false);
@@ -87,12 +87,12 @@ StreamDataDialog::StreamDataDialog(const PoDoFo::PdfObject& streamObj, const std
     }
 
     if (!imageLoaded) {
-        if (mStreamData && !mStreamData->isEmpty()) {
-            ui->uiStreamData->insertPlainText(mStreamData->data());
+        if (data.GetStreamData()) {
+            ui->uiStreamData->insertPlainText(QString(data.GetStreamData()));
             ui->uiDisplayModeCombo->setCurrentIndex(static_cast<int> (DisplayMode::Text));
             ui->uiDisplayEncodingCombo->setCurrentIndex(static_cast<int> (DisplayEncoding::Latin1));
 
-            ui->uiDecodedLength->setText(QString("%1").arg(mStreamData->size()));
+            ui->uiDecodedLength->setText(QString("%1").arg(data.GetStreamLength()));
         }
 
         ui->uiEncodedLength->setText(QString("%1").arg(dict.GetKey("Length")->GetNumber()));
@@ -132,21 +132,22 @@ void StreamDataDialog::on_uiSaveToFileBtn_clicked()
 
 void StreamDataDialog::on_uiDisplayModeCombo_currentIndexChanged(int index)
 {
+    QByteArray data = QByteArray::fromRawData(item_data.GetStreamData(), item_data.GetStreamLength());
     DisplayMode mode = static_cast<DisplayMode> (index);
 
     switch (mode) {
     case DisplayMode::Text:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(mStreamData->data());
+        ui->uiStreamData->insertPlainText(data.data());
         break;
 
     case DisplayMode::Base64:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(mStreamData->toBase64());
+        ui->uiStreamData->insertPlainText(data.toBase64());
         break;
     case DisplayMode::Hex:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(mStreamData->toHex());
+        ui->uiStreamData->insertPlainText(data.toHex());
         break;
     default:
         break;
@@ -155,21 +156,22 @@ void StreamDataDialog::on_uiDisplayModeCombo_currentIndexChanged(int index)
 
 void StreamDataDialog::on_uiDisplayEncodingCombo_currentIndexChanged(int index)
 {
+    QByteArray data = QByteArray::fromRawData(item_data.GetStreamData(), item_data.GetStreamLength());
     DisplayEncoding encoding = static_cast<DisplayEncoding> (index);
 
     switch (encoding) {
     case DisplayEncoding::Latin1:
     case DisplayEncoding::PDFDocEncoding:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(QString::fromLatin1(mStreamData->data()));
+        ui->uiStreamData->insertPlainText(QString::fromLatin1(data.data()));
         break;
     case DisplayEncoding::Unicode:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(QString::fromUtf16(reinterpret_cast<ushort*> (mStreamData->data())));
+        ui->uiStreamData->insertPlainText(QString::fromUtf16(reinterpret_cast<ushort*> (data.data())));
         break;
     case DisplayEncoding::Ascii:
         ui->uiStreamData->clear();
-        ui->uiStreamData->insertPlainText(QString::fromStdString(mStreamData->data()));
+        ui->uiStreamData->insertPlainText(QString::fromStdString(data.data()));
         break;
     default:
         break;

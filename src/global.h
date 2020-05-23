@@ -18,13 +18,136 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1
 #define GLOBAL_H
 
 #include "podofo/base/PdfObject.h"
-#include <QByteArray>
+#include "podofo/base/PdfStream.h"
+#include "podofo/base/PdfMemStream.h"
 #include <memory>
+#include <cstring>
 
-struct ViewItemData {
-    std::shared_ptr<PoDoFo::PdfObject> object { nullptr };
-    std::shared_ptr<QByteArray> stream_data { nullptr };
+class ViewItemData {
+private:
+    PoDoFo::PdfObject* object { nullptr };
     int currentViewIndex { -1 } ;
+    bool release { false };
+    char* stream_data { nullptr };
+    int stream_data_size { 0 };
+
+public:
+    explicit ViewItemData(int idx) :
+        currentViewIndex { idx }
+    {
+
+    }
+
+    ViewItemData(PoDoFo::PdfObject* obj, int idx) :
+        object {obj},
+        currentViewIndex {idx}
+    {
+
+    }
+
+    ViewItemData(const PoDoFo::PdfObject& obj, int idx) :
+        currentViewIndex(idx)
+    {
+        object = new PoDoFo::PdfObject(obj);
+        release = true;
+    }
+
+    ViewItemData(const PoDoFo::PdfObject& obj, char* stream, int stream_size, int idx) :
+        currentViewIndex { idx },
+        stream_data { stream },
+        stream_data_size { stream_size }
+    {
+        object = new PoDoFo::PdfObject(obj);
+        release = true;
+    }
+
+    ~ViewItemData() {
+        if (release) {
+            if (object)
+                delete object;
+        }
+
+        if (stream_data)
+            free(stream_data);
+    }
+
+    ViewItemData(const ViewItemData& data) {
+        if (data.object)
+            object = new PoDoFo::PdfObject(*data.object);
+
+        stream_data = (char*) malloc(data.stream_data_size);
+        std::memcpy(stream_data, data.stream_data, data.stream_data_size);
+        stream_data_size = data.stream_data_size;
+        currentViewIndex = data.currentViewIndex;
+        release = true;
+    }
+
+    ViewItemData& operator=(const ViewItemData& data) {
+        if (this != &data) {
+            if (release) {
+                if (this->object)
+                    delete this->object;
+            }
+
+            if (stream_data)
+                free(stream_data);
+
+            this->object = new PoDoFo::PdfObject(*data.object);
+            this->stream_data = (char*) malloc(data.stream_data_size);
+            std::memcpy(stream_data, data.stream_data, data.stream_data_size);
+            this->stream_data_size = data.stream_data_size;
+            this->currentViewIndex = data.currentViewIndex;
+            this->release = data.release;
+        }
+
+        return *this;
+    }
+
+    ViewItemData(ViewItemData&& data) {
+        object = data.object;
+        stream_data = data.stream_data;
+        stream_data_size = data.stream_data_size;
+        currentViewIndex = data.currentViewIndex;
+        release = data.release;
+
+        data.object = nullptr;
+        data.stream_data = nullptr;
+        data.stream_data_size = 0;
+        data.currentViewIndex = 0;
+        data.release = false;
+    }
+
+    ViewItemData& operator=(ViewItemData&& data) {
+        if (this != &data) {
+            if (release) {
+                if (this->object)
+                    delete this->object;
+            }
+
+            if (this->stream_data)
+                free(this->stream_data);
+
+            this->object = data.object;
+            this->stream_data = data.stream_data;
+            this->stream_data_size = data.stream_data_size;
+            this->currentViewIndex = data.currentViewIndex;
+            this->release = data.release;
+
+            data.object = nullptr;
+            data.stream_data = nullptr;
+            data.stream_data_size = 0;
+            data.currentViewIndex = 0;
+            data.release = false;
+        }
+
+        return *this;
+    }
+
+    const PoDoFo::PdfObject* GetObject() const noexcept { return object; }
+    const char* GetStreamData() const noexcept { return stream_data; }
+    int GetStreamLength() const noexcept { return stream_data_size; }
+    int GetCurrentViewIndex() const noexcept { return currentViewIndex; }
+    bool HasStream() const noexcept { return stream_data_size > 0; }
 };
 
 #endif // GLOBAL_H
